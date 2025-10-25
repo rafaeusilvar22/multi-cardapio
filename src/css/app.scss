@@ -1,1 +1,28 @@
 // app global css in SCSS form
+@import 'assets/utilities/typography.scss';
+
+@font-face {
+  font-family: 'Raleway', sans-serif;
+  src: url('assets/font/Raleway/Raleway-VariableFont_wght.ttf');
+}
+
+body {
+  background-color: #FAFAFA;
+  font-family: 'Raleway', sans-serif;
+}
+
+.rs-constrain-width {
+  width: 100%;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+p {
+  margin: 0;
+}
+
+.q-dialog-plugin {
+  border-radius: 8px !important;
+  padding: 8px !important;
+}
