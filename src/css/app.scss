@@ -1,5 +1,7 @@
 // app global css in SCSS form
 @import 'assets/utilities/typography.scss';
+@import 'assets/utilities/notifications.scss';
+@import 'assets/components/inputs/input.scss';
 
 @font-face {
   font-family: 'Raleway', sans-serif;

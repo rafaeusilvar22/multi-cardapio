@@ -1,0 +1,23 @@
+.bg-success-notify {
+  background-color: #4ade80;
+  border-radius: 8px;
+}
+
+.bg-success-notify .q-notification__message {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.bg-error-notify {
+  background-color: #fff;
+}
+
+.bg-error-notify .q-notification__message {
+  color: #ef4444;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}

@@ -1,0 +1,51 @@
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+// Animação para avançar (próximo passo)
+.slide-fade-forward-enter-active,
+.slide-fade-forward-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-fade-forward-leave-active {
+  position: absolute;
+  width: 100%;
+}
+
+.slide-fade-forward-enter-from {
+  opacity: 0;
+  transform: translateX(30px); // Entra da direita
+}
+
+.slide-fade-forward-leave-to {
+  opacity: 0;
+  transform: translateX(-30px); // Sai para esquerda
+}
+
+// Animação para voltar (passo anterior)
+.slide-fade-backward-enter-active,
+.slide-fade-backward-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-fade-backward-leave-active {
+  position: absolute;
+  width: 100%;
+}
+
+.slide-fade-backward-enter-from {
+  opacity: 0;
+  transform: translateX(-30px); // Entra da esquerda
+}
+
+.slide-fade-backward-leave-to {
+  opacity: 0;
+  transform: translateX(30px); // Sai para direita
+}

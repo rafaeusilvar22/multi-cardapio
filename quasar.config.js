@@ -3,8 +3,10 @@
 
 import { defineConfig } from '#q-app/wrappers'
 import { fileURLToPath } from 'node:url'
+import dotenv from "dotenv";
 
 export default defineConfig((ctx) => {
+  const env = dotenv.config().parsed; // Load .env variables
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
@@ -39,7 +41,7 @@ export default defineConfig((ctx) => {
         node: 'node20',
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -48,7 +50,7 @@ export default defineConfig((ctx) => {
 
       // publicPath: '/',
       // analyze: true,
-      // env: {},
+      env: env,
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,
@@ -91,8 +93,9 @@ export default defineConfig((ctx) => {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
     devServer: {
-      // https: true,
+      https: true,
       open: true, // opens browser window automatically
+      port: process.env.PORT || 8080,
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
@@ -125,7 +128,7 @@ export default defineConfig((ctx) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: [],
+      plugins: ["Loading", "Notify", "Dialog"],
     },
 
     // animations: 'all', // --- includes all animations
@@ -221,7 +224,7 @@ export default defineConfig((ctx) => {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'fitmanage',
+        appId: 'rs-cardapio',
       },
     },
 

@@ -1,0 +1,33 @@
+.rs-input-base {
+  border-radius: 8px;
+  padding: 0px 16px;
+  border: 1px solid #e0e0e0;
+  width: 100%;
+  transition: 0.3s;
+
+  input {
+    color: #333333;
+
+    &::placeholder {
+      color: var(--q-placeholder);
+      opacity: 1;
+    }
+  }
+
+  &:hover {
+    filter: brightness(95%);
+    border: 1px solid var(--q-secondary);
+  }
+
+  &:focus-within {
+    border: 1px solid var(--q-secondary);
+    outline: none;
+    filter: brightness(95%);
+  }
+
+  &:active {
+    border: 1px solid var(--q-secondary);
+    outline: none;
+    filter: brightness(95%);
+  }
+}

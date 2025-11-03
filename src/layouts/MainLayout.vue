@@ -20,8 +20,8 @@
               {{ getInitials('Rafael Silva') }}
             </q-avatar>
             <div class="text-left q-ml-sm">
-              <p class="mpi-m-regular">{{ 'Rafael Silva' }}</p>
-              <p class="mpi-s-regular">Admin</p>
+              <p class="rs-m-regular">{{ 'Rafael Silva' }}</p>
+              <p class="rs-s-regular">Admin</p>
             </div>
           </template>
           <div class="column items-center q-pa-md q-gutter-y-sm">
@@ -29,7 +29,7 @@
               {{ getInitials('Rafael Silva') }}
             </q-avatar>
 
-            <div class="mpi-xl-semibold">{{ user?.nome }}</div>
+            <div class="rs-xl-semibold">{{ user?.nome }}</div>
 
             <p>
               E-mail:
@@ -39,7 +39,7 @@
               {{ user?.perfil.nome }}
             </q-chip>
             <p>
-              Orgão: <span class="mpi-m-semibold">{{ user?.orgao.nome }}</span>
+              Orgão: <span class="rs-m-semibold">{{ user?.orgao.nome }}</span>
             </p>
 
             <q-separator class="q-my-md full-width" />
@@ -94,7 +94,7 @@
               />
             </q-item-section>
             <q-item-section
-              class="mpi-l-regular"
+              class="rs-l-regular"
               :class="$route.name === menuItem.route ? 'text-white' : 'text-primary'"
             >
               {{ menuItem.label }}
@@ -139,7 +139,7 @@ const menuList = [
   { label: 'Pedidos', icon: 'fa-solid fa-utensils', route: 'pedidos' },
   { label: 'Produtos', icon: 'fa-solid fa-burger', route: 'produtos' },
   { label: 'Categoria', icon: 'fa-solid fa-layer-group', route: 'categorias' },
-  { label: 'Configurações', icon: 'fa-solid fa-gear', route: 'configuracoes-estabelecimento' },
+  { label: 'Ajustes', icon: 'fa-solid fa-gear', route: 'configuracoes-estabelecimento' },
 ]
 
 function toggleLeftDrawer() {

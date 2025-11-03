@@ -12,6 +12,23 @@ const routes = [
       { path: 'categorias/nova', name: 'nova-categoria', component: () => import('src/pages/Management/NewCategoryPage.vue') },
       // { path: 'categorias/:id', name: 'editar-categoria', component: () => import('src/pages/Management/EditCategoryPage.vue') },
       { path: 'configuracoes-estabelecimento', name: 'configuracoes-estabelecimento', component: () => import('src/pages/Management/EstablishmentSettings.vue') },
+
+    ],
+  },
+  {
+    path: '/',
+    component: () => import('layouts/AuthLayout.vue'),
+    children: [
+      {
+        path: 'criar-conta',
+        name: 'criar-conta',
+        component: () => import('src/pages/auth/CreateAccountPage.vue'),
+      },
+      {
+        path: 'login',
+        name: 'login',
+        component: () => import('src/pages/auth/LoginPage.vue'),
+      },
     ],
   },
 
