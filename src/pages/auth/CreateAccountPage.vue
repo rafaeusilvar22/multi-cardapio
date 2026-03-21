@@ -393,8 +393,8 @@ const fetchZipCode = async (zipCode) => {
 const onSubmit = async () => {
   loading.value = true
   try {
-    const response = await authStore.createNewUser(form.value)
-    notifySuccess(t(response.message || 'Conta criada com sucesso!'), 'bottom-right')
+    await authStore.createNewUser(form.value)
+    notifySuccess('Conta criada com sucesso! Aguarde a aprovação do administrador.', 'bottom-right')
     router.push({ name: 'login' })
   } catch (error) {
     const errorMessage = error.message || 'Erro ao criar conta'
