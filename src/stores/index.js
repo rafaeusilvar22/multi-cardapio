@@ -1,8 +1,9 @@
 import { markRaw } from "vue";
 import { store } from "quasar/wrappers";
 import { createPinia } from "pinia";
-import createPersistedState from "pinia-plugin-persistedstate";
+import { createPersistedState } from "pinia-plugin-persistedstate";
 import router from "../router";
+import { cryptoJsEncrypt, cryptoJsDecrypt } from "src/utils/crypto";
 
 /*
  * If not building with SSR mode, you can
@@ -19,7 +20,14 @@ export default store((/* { ssrContext } */) => {
   pinia.use(({ store }) => {
     store.router = markRaw(router);
   });
-  pinia.use(createPersistedState);
+  pinia.use(
+    createPersistedState({
+      serializer: {
+        serialize: (value) => cryptoJsEncrypt(value),
+        deserialize: (value) => cryptoJsDecrypt(value),
+      },
+    }),
+  );
 
   // You can add Pinia plugins here
   // pinia.use(SomePiniaPlugin)

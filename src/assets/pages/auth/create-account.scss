@@ -18,7 +18,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(25, 118, 210, 0.9) 0%, rgba(13, 71, 161, 0.9) 100%);
+  background: linear-gradient(135deg, rgba(229, 57, 53, 0.92) 0%, rgba(183, 28, 28, 0.95) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,7 +78,7 @@
 }
 
 .rs-step.active .rs-step-number {
-  background: #1976d2;
+  background: var(--q-primary);
   color: white;
 }
 
@@ -94,7 +94,7 @@
 }
 
 .rs-step.active .rs-step-label {
-  color: #1976d2;
+  color: var(--q-primary);
 }
 
 .rs-step-line {

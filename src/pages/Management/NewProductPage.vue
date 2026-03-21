@@ -5,7 +5,7 @@
         <!-- Breadcrumb -->
         <div class="q-mb-md">
           <q-breadcrumbs>
-            <q-breadcrumbs-el label="Produtos" icon="inventory" to="/products" />
+            <q-breadcrumbs-el label="Produtos" icon="inventory" to="/produtos" />
             <q-breadcrumbs-el
               :label="mode === 'create' ? 'Novo Produto' : 'Editar Produto'"
               icon="edit"
@@ -127,7 +127,7 @@
                           v-model="form.category"
                           outlined
                           label="Categoria *"
-                          :options="categories"
+                          :options="categoryOptions"
                           emit-value
                           map-options
                           :rules="[(val) => !!val || 'Categoria é obrigatória']"
@@ -217,9 +217,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
+import useLoading from 'src/composables/showLoading'
+import useNotify from 'src/composables/showNotify'
+import { ProductService } from 'src/services/ProductService'
+import { CategoryService } from 'src/services/CategoryService'
 
 defineOptions({
   name: 'ProductFormPage',
@@ -228,21 +232,21 @@ defineOptions({
 const router = useRouter()
 const route = useRoute()
 const $q = useQuasar()
+const { showLoading, hideLoading } = useLoading()
+const { notifySuccess, notifyError } = useNotify()
 
 const formRef = ref(null)
 const imageFile = ref(null)
 const mode = ref('create')
+const productUuid = ref(null)
 
-const categories = [
-  { label: 'Hambúrgueres', value: 'Hambúrgueres' },
-  { label: 'Pizzas', value: 'Pizzas' },
-  { label: 'Bebidas', value: 'Bebidas' },
-  { label: 'Sobremesas', value: 'Sobremesas' },
-  { label: 'Acompanhamentos', value: 'Acompanhamentos' },
-]
+const categoriesRaw = ref([])
+
+const categoryOptions = computed(() =>
+  categoriesRaw.value.map((c) => ({ label: c.name, value: c.id }))
+)
 
 const form = ref({
-  id: null,
   name: '',
   description: '',
   price: null,
@@ -251,30 +255,44 @@ const form = ref({
   status: true,
 })
 
-onMounted(() => {
-  // Verifica se está editando (pode vir da rota ou query params)
-  const productId = route.params.id || route.query.id
+onMounted(async () => {
+  showLoading()
+  try {
+    const categoriesResp = await CategoryService.getAll()
+    const cats = categoriesResp?.data?.categories || categoriesResp?.data || categoriesResp || []
+    categoriesRaw.value = Array.isArray(cats) ? cats : []
+  } catch {
+    notifyError('Erro ao carregar categorias')
+  } finally {
+    hideLoading()
+  }
 
-  if (productId) {
+  const uuid = route.params.uuid
+  if (uuid) {
     mode.value = 'edit'
-    loadProduct(productId)
+    productUuid.value = uuid
+    await loadProduct(uuid)
   }
 })
 
-const loadProduct = (id) => {
-  // Aqui você buscaria os dados do produto
-  // Simulação de dados para exemplo
-  const mockProduct = {
-    id: id,
-    name: 'X-Bacon',
-    description: 'Hambúrguer artesanal com bacon crocante, queijo cheddar, alface e tomate',
-    price: 28.9,
-    category: 'Hambúrgueres',
-    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=400&fit=crop',
-    status: true,
+const loadProduct = async (uuid) => {
+  showLoading()
+  try {
+    const resp = await ProductService.getOne(uuid)
+    const prod = resp?.data?.product || resp?.data || resp
+    form.value = {
+      name: prod.name,
+      description: prod.description,
+      price: prod.price,
+      category: prod.categories?.[0]?.id || null,
+      image: prod.image_url,
+      status: prod.is_available,
+    }
+  } catch {
+    notifyError('Erro ao carregar produto')
+  } finally {
+    hideLoading()
   }
-
-  form.value = { ...mockProduct }
 }
 
 const handleImageUpload = (file) => {
@@ -289,23 +307,33 @@ const handleImageUpload = (file) => {
 
 const handleSubmit = async () => {
   const isValid = await formRef.value.validate()
+  if (!isValid) return
 
-  if (isValid) {
-    // Aqui você salvaria os dados
-    console.log('Salvando produto:', form.value)
+  const apiData = {
+    prod_name: form.value.name,
+    prod_description: form.value.description,
+    prod_price: form.value.price,
+    prod_image_url: form.value.image,
+    prod_is_available: form.value.status,
+    category_ids: form.value.category ? [form.value.category] : [],
+  }
 
-    $q.notify({
-      message:
-        mode.value === 'create'
-          ? 'Produto cadastrado com sucesso!'
-          : 'Produto atualizado com sucesso!',
-      color: 'positive',
-      icon: 'check_circle',
-      position: 'top-right',
-    })
-
-    // Volta para a listagem
-    router.push('/products')
+  showLoading()
+  try {
+    if (mode.value === 'create') {
+      await ProductService.create(apiData)
+      notifySuccess('Produto cadastrado com sucesso!')
+    } else {
+      await ProductService.update(productUuid.value, apiData)
+      notifySuccess('Produto atualizado com sucesso!')
+    }
+    router.push('/produtos')
+  } catch {
+    notifyError(
+      mode.value === 'create' ? 'Erro ao cadastrar produto' : 'Erro ao atualizar produto',
+    )
+  } finally {
+    hideLoading()
   }
 }
 
@@ -324,7 +352,7 @@ const handleCancel = () => {
       flat: true,
     },
   }).onOk(() => {
-    router.push('/products')
+    router.push('/produtos')
   })
 }
 </script>

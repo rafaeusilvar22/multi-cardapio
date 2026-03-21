@@ -1,42 +1,74 @@
 <template>
-  <q-page class="row full-height">
-    <div class="gt-sm col-sm-6 flex flex-center rs-bg-auth"></div>
+  <q-page class="rs-login-page">
+    <div class="row no-wrap full-height">
+      <!-- Left Side: Image (Desktop only) -->
+      <div class="col-6 gt-sm rs-login-image-section">
+        <div class="rs-login-overlay">
+          <div class="rs-login-overlay-content">
+            <q-icon name="restaurant_menu" size="80px" color="white" class="q-mb-md" />
+            <div class="text-h4 text-white text-weight-bold q-mb-sm">Bem-vindo de volta</div>
+            <div class="text-subtitle1 text-white">
+              Acesse o painel e gerencie seus pedidos, cardápio e muito mais
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <div class="col-xs-12 2 col-md-6 flex flex-center">
-      <q-card class="q-pa-lg" style="width: 450px; max-width: 90%">
-        <q-card-section>
-          <q-img
-            class="rs-logo-auth"
-            src="https://img.freepik.com/free-vector/restaurant-mural-wallpaper_23-2148695092.jpg?semt=ais_hybrid&w=740&q=80"
-          />
-          <p class="lt-md rs-heading-m q-pt-md">Painel de Conflitos</p>
-          <p class="lt-md rs-xl-regular">Área Administrativa</p>
-          <div class="rs-heading-xs q-my-lg">Entrar</div>
-          <q-form class="q-gutter-y-md" @submit="handleLogin">
+      <!-- Right Side: Form -->
+      <div class="col-12 col-sm-6 rs-login-form-section">
+        <div class="rs-login-form-container">
+          <div class="rs-login-form-header">
+            <div class="text-h5 text-weight-bold text-primary">Entrar</div>
+            <div class="text-subtitle2 text-grey-7 q-mt-sm">
+              Acesse o painel de controle do seu estabelecimento
+            </div>
+          </div>
+
+          <q-form class="rs-login-form" @submit="handleLogin">
             <q-input
               v-model="formData.email"
               borderless
               class="rs-input-base"
               dense
               type="email"
-              label="Email"
+              label="E-mail"
               :rules="[(val) => (val && val.length > 0) || 'E-mail necessário']"
-            />
-            <q-input
-              v-model="formData.password"
-              borderless
-              class="rs-input-base"
-              dense
-              label="Senha"
-              type="password"
-              :rules="[(val) => (val && val.length > 0) || 'Senha necessária']"
-            />
+            >
+              <template v-slot:prepend>
+                <q-icon name="email" />
+              </template>
+            </q-input>
+
+            <div>
+              <q-input
+                v-model="formData.password"
+                borderless
+                class="rs-input-base"
+                dense
+                label="Senha"
+                :type="showPassword ? 'text' : 'password'"
+                :rules="[(val) => (val && val.length > 0) || 'Senha necessária']"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="lock" />
+                </template>
+                <template v-slot:append>
+                  <q-icon
+                    :name="showPassword ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="showPassword = !showPassword"
+                  />
+                </template>
+              </q-input>
+              <div class="rs-login-forgot-link q-mt-xs">Esqueci minha senha</div>
+            </div>
+
             <q-btn
               no-caps
               unelevated
               label="Entrar"
               color="primary"
-              class="full-width"
+              class="full-width rs-login-btn-submit"
               icon-right="login"
               type="submit"
               :loading="loading"
@@ -53,8 +85,8 @@
               icon-right="person_add"
             />
           </q-form>
-        </q-card-section>
-      </q-card>
+        </div>
+      </div>
     </div>
   </q-page>
 </template>
@@ -72,13 +104,14 @@ defineOptions({
 
 const { t } = useI18n()
 const loading = ref(false)
+const showPassword = ref(false)
 const router = useRouter()
 const authStore = useAuthStore()
 const { notifyError, notifySuccess } = useNotify()
 
 const formData = ref({
-  email: 'rafaelrodriguesdasilva72@gmail.com',
-  password: 'Rafael22*',
+  email: '',
+  password: '',
 })
 
 const handleLogin = async () => {
@@ -91,14 +124,7 @@ const handleLogin = async () => {
   }
 }
 </script>
-<style lang="scss">
-.rs-bg-auth {
-  background: rgb(197, 57, 57) no-repeat center center;
-  background-size: cover;
-}
-.rs-logo-auth {
-  width: 100%;
-  margin: 0 auto;
-  max-width: 250px;
-}
+
+<style scoped lang="scss">
+@import 'src/assets/pages/auth/login.scss';
 </style>

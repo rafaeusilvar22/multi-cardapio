@@ -9,7 +9,7 @@ export default function useNotify() {
       html: true,
       classes: "bg-success-notify",
       position,
-      avatar: "/images/svg/verify-notify.svg",
+      icon: "check_circle",
       actions: [
         {
           icon: "close",
@@ -29,7 +29,7 @@ export default function useNotify() {
       html: true,
       classes: "bg-error-notify",
       position,
-      avatar: "/images/svg/error-notify-round.svg",
+      icon: "error",
       actions: [
         {
           icon: "close",
@@ -49,7 +49,7 @@ export default function useNotify() {
       html: true,
       classes: "bg-warning-notify",
       position,
-      avatar: "/svg/notify-warning.svg",
+      icon: "warning",
       actions: [
         {
           icon: "close",
@@ -90,7 +90,7 @@ export default function useNotify() {
       message: message,
       classes: "bg-info-notify",
       position,
-      avatar: "/svg/warning-info.svg",
+      icon: "info",
       actions: [
         {
           icon: "close",

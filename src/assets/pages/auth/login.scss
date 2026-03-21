@@ -1,0 +1,83 @@
+.rs-login-page {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/* Image Section */
+.rs-login-image-section {
+  background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  min-height: 100vh;
+}
+
+.rs-login-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(229, 57, 53, 0.92) 0%, rgba(183, 28, 28, 0.95) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.rs-login-overlay-content {
+  text-align: center;
+  max-width: 420px;
+}
+
+/* Form Section */
+.rs-login-form-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+.rs-login-form-container {
+  width: 100%;
+  max-width: 420px;
+}
+
+.rs-login-form-header {
+  margin-bottom: 40px;
+}
+
+/* Form */
+.rs-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Action Buttons */
+.rs-login-btn-submit {
+  height: 48px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.rs-login-forgot-link {
+  font-size: 13px;
+  color: var(--q-primary);
+  cursor: pointer;
+  text-align: right;
+  margin-top: -8px;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .rs-login-form-section {
+    padding: 24px 20px;
+  }
+}

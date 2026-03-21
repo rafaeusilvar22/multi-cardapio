@@ -1,12 +1,14 @@
 import { api } from "src/boot/axios";
 import { errorsMiddleware } from "src/utils/errorMiddleware";
+import { API_ENDPOINTS } from "./endpoints";
 
-const BASE_URL = process.env.BACK_END_BASE_URL;
+const AUTH = API_ENDPOINTS.AUTH;
+const USER = API_ENDPOINTS.USER;
 
 export const AuthService = {
   async login(form) {
     try {
-      const resp = await api.post(`${BASE_URL}/auth/login`, form);
+      const resp = await api.post(`${AUTH}/login`, form);
       return {
         user: resp.data.data.user,
         token: resp.data.data.token,
@@ -17,31 +19,30 @@ export const AuthService = {
     }
   },
 
-  async logout(token) {
+  async logout() {
     try {
-      api.defaults.headers.common.Authorization = `Bearer ${token}`;
-      const resp = await api.post(`${BASE_URL}/auth/logout`);
+      const resp = await api.post(`${AUTH}/logout`);
       return resp.data;
     } catch (error) {
       throw errorsMiddleware(error);
     }
   },
 
-  async getUserProfile(token) {
+  async getUserProfile() {
     try {
-      api.defaults.headers.common.Authorization = `Bearer ${token}`;
-      const resp = await api.get(`${BASE_URL}/user/user-profile`);
+      const resp = await api.get(`${USER}/profile`);
       return resp.data;
     } catch (error) {
       throw errorsMiddleware(error);
     }
   },
+
   async createNewUser(form) {
     try {
-      const resp = await api.post(`${BASE_URL}/user/create`, form);
+      const resp = await api.post(`${USER}/create`, form);
       return resp.data;
     } catch (error) {
-      await errorsMiddleware(error);
+      throw errorsMiddleware(error);
     }
   }
 };

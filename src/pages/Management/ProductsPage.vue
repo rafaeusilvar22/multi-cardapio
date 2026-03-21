@@ -1,182 +1,194 @@
 <template>
   <q-page padding>
-    <div class="col-12">
-      <q-card>
-        <q-card-section>
-          <div class="row items-center justify-between">
-            <div class="col">
-              <div class="text-h6 text-weight-medium">Produtos do Cardápio</div>
-              <div class="text-caption text-grey-7">Gerencie os produtos disponíveis</div>
-            </div>
-            <div>
-              <q-btn
-                unelevated
-                color="primary"
-                icon="add"
-                label="Adicionar Produto"
-                to="produtos/novo"
-              />
-            </div>
-          </div>
-        </q-card-section>
-
-        <q-separator />
-
-        <!-- Filtros -->
-        <q-card-section>
-          <div class="row q-col-gutter-md">
-            <div class="col-12 col-sm-6 col-md-4">
-              <q-input
-                v-model="filters.search"
-                outlined
-                dense
-                placeholder="Buscar produto..."
-                clearable
-              >
-                <template v-slot:prepend>
-                  <q-icon name="search" />
-                </template>
-              </q-input>
-            </div>
-            <div class="col-12 col-sm-6 col-md-3">
-              <q-select
-                v-model="filters.category"
-                outlined
-                dense
-                placeholder="Categoria"
-                :options="categories"
-                clearable
-                emit-value
-                map-options
-              >
-                <template v-slot:prepend>
-                  <q-icon name="category" />
-                </template>
-              </q-select>
-            </div>
-            <div class="col-12 col-sm-6 col-md-3">
-              <q-select
-                v-model="filters.status"
-                outlined
-                dense
-                placeholder="Status"
-                :options="statusOptions"
-                clearable
-                emit-value
-                map-options
-              >
-                <template v-slot:prepend>
-                  <q-icon name="toggle_on" />
-                </template>
-              </q-select>
-            </div>
-          </div>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-section class="q-pa-none">
-          <q-table
-            flat
-            row-key="id"
-            :rows="filteredProducts"
-            :columns="columns"
-            :pagination="{ rowsPerPage: 10 }"
-          >
-            <template v-slot:body-cell-image="props">
-              <q-td :props="props">
-                <q-avatar size="50px" square>
-                  <img :src="props.value" :alt="props.row.name" />
-                </q-avatar>
-              </q-td>
-            </template>
-
-            <template v-slot:body-cell-name="props">
-              <q-td :props="props">
-                <div class="text-weight-medium">{{ props.value }}</div>
-                <div class="text-caption text-grey-7 ellipsis" style="max-width: 300px">
-                  {{ props.row.description }}
-                </div>
-              </q-td>
-            </template>
-
-            <template v-slot:body-cell-category="props">
-              <q-td :props="props">
-                <q-badge
-                  :color="getCategoryColor(props.value)"
-                  text-color="white"
-                  :label="props.value"
-                />
-              </q-td>
-            </template>
-
-            <template v-slot:body-cell-price="props">
-              <q-td :props="props">
-                <span class="text-weight-bold text-positive">
-                  {{ formatCurrency(props.value) }}
-                </span>
-              </q-td>
-            </template>
-
-            <template v-slot:body-cell-status="props">
-              <q-td :props="props">
-                <q-toggle
-                  :model-value="props.value"
-                  color="positive"
-                  @update:model-value="handleToggleStatus(props.row)"
-                  checked-icon="check"
-                  unchecked-icon="close"
-                >
-                  <q-tooltip>
-                    {{ props.value ? 'Ativo' : 'Inativo' }}
-                  </q-tooltip>
-                </q-toggle>
-              </q-td>
-            </template>
-
-            <template v-slot:body-cell-actions="props">
-              <q-td :props="props">
-                <q-btn
-                  flat
-                  round
-                  dense
-                  color="primary"
-                  icon="edit"
-                  size="sm"
-                  @click="handleEditProduct(props.row)"
-                >
-                  <q-tooltip>Editar</q-tooltip>
-                </q-btn>
-                <q-btn
-                  flat
-                  round
-                  dense
-                  color="negative"
-                  icon="delete"
-                  size="sm"
-                  class="q-ml-xs"
-                  @click="handleDeleteProduct(props.row)"
-                >
-                  <q-tooltip>Excluir</q-tooltip>
-                </q-btn>
-              </q-td>
-            </template>
-          </q-table>
-        </q-card-section>
-      </q-card>
+    <!-- Page Header -->
+    <div class="rs-page-header">
+      <div>
+        <div class="rs-page-title">Produtos do Cardápio</div>
+        <div class="rs-page-subtitle">Gerencie os produtos disponíveis</div>
+      </div>
+      <q-btn
+        unelevated
+        no-caps
+        color="primary"
+        icon="add"
+        label="Adicionar Produto"
+        style="border-radius: 8px"
+        to="produtos/novo"
+      />
     </div>
+
+    <q-card class="rs-data-table">
+      <!-- Filtros -->
+      <q-card-section>
+        <div class="row q-col-gutter-md">
+          <div class="col-12 col-sm-6 col-md-4">
+            <q-input
+              v-model="filters.search"
+              outlined
+              dense
+              placeholder="Buscar produto..."
+              clearable
+            >
+              <template v-slot:prepend>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </div>
+          <div class="col-12 col-sm-6 col-md-3">
+            <q-select
+              v-model="filters.category"
+              outlined
+              dense
+              placeholder="Categoria"
+              :options="categoryOptions"
+              clearable
+              emit-value
+              map-options
+            >
+              <template v-slot:prepend>
+                <q-icon name="category" />
+              </template>
+            </q-select>
+          </div>
+          <div class="col-12 col-sm-6 col-md-3">
+            <q-select
+              v-model="filters.status"
+              outlined
+              dense
+              placeholder="Status"
+              :options="statusOptions"
+              clearable
+              emit-value
+              map-options
+            >
+              <template v-slot:prepend>
+                <q-icon name="toggle_on" />
+              </template>
+            </q-select>
+          </div>
+        </div>
+      </q-card-section>
+
+      <q-separator />
+
+      <q-card-section class="q-pa-none">
+        <q-table
+          flat
+          row-key="uuid"
+          :rows="displayedProducts"
+          :columns="columns"
+          v-model:pagination="pagination"
+          :loading="loading"
+          :rows-per-page-options="[10, 20, 50]"
+          @request="onTableRequest"
+        >
+          <template v-slot:body-cell-image="props">
+            <q-td :props="props">
+              <q-avatar size="48px" color="grey-2" style="border-radius: 10px">
+                <img v-if="props.value" :src="props.value" :alt="props.row.name" style="object-fit: cover" />
+                <q-icon v-else name="fastfood" size="24px" color="grey-5" />
+              </q-avatar>
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-name="props">
+            <q-td :props="props">
+              <div class="text-weight-medium">{{ props.value }}</div>
+              <div class="text-caption text-grey-6 ellipsis" style="max-width: 300px">
+                {{ props.row.description }}
+              </div>
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-category="props">
+            <q-td :props="props">
+              <q-chip
+                dense
+                outline
+                size="sm"
+                :color="getCategoryColor(props.value)"
+                :label="props.value"
+                style="border-radius: 20px"
+              />
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-price="props">
+            <q-td :props="props">
+              <span class="text-weight-bold text-positive">
+                {{ formatCurrency(props.value) }}
+              </span>
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-status="props">
+            <q-td :props="props">
+              <q-toggle
+                :model-value="props.value"
+                color="positive"
+                @update:model-value="handleToggleStatus(props.row)"
+                checked-icon="check"
+                unchecked-icon="close"
+              >
+                <q-tooltip>
+                  {{ props.value ? 'Ativo' : 'Inativo' }}
+                </q-tooltip>
+              </q-toggle>
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-actions="props">
+            <q-td :props="props">
+              <q-btn
+                flat
+                round
+                dense
+                color="primary"
+                icon="edit"
+                size="sm"
+                @click="handleEditProduct(props.row)"
+              >
+                <q-tooltip>Editar</q-tooltip>
+              </q-btn>
+              <q-btn
+                flat
+                round
+                dense
+                color="negative"
+                icon="delete"
+                size="sm"
+                class="q-ml-xs"
+                @click="handleDeleteProduct(props.row)"
+              >
+                <q-tooltip>Excluir</q-tooltip>
+              </q-btn>
+            </q-td>
+          </template>
+        </q-table>
+      </q-card-section>
+    </q-card>
   </q-page>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
+import useLoading from 'src/composables/showLoading'
+import useNotify from 'src/composables/showNotify'
+import { ProductService } from 'src/services/ProductService'
+import { CategoryService } from 'src/services/CategoryService'
+import useConfirmDialog from 'src/composables/useConfirmDialog'
 
 defineOptions({
   name: 'ProductsPage',
 })
 
 const $q = useQuasar()
+const router = useRouter()
+const { showLoading, hideLoading } = useLoading()
+const { notifySuccess, notifyError } = useNotify()
+const { confirm } = useConfirmDialog()
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('pt-BR', {
@@ -194,94 +206,20 @@ const columns = [
   { name: 'actions', label: 'Ações', field: 'actions', align: 'center' },
 ]
 
-const categories = [
-  { label: 'Hambúrgueres', value: 'Hambúrgueres' },
-  { label: 'Pizzas', value: 'Pizzas' },
-  { label: 'Bebidas', value: 'Bebidas' },
-  { label: 'Sobremesas', value: 'Sobremesas' },
-  { label: 'Acompanhamentos', value: 'Acompanhamentos' },
-]
-
 const statusOptions = [
   { label: 'Ativo', value: true },
   { label: 'Inativo', value: false },
 ]
 
-const products = ref([
-  {
-    id: 1,
-    name: 'X-Bacon',
-    description: 'Hambúrguer artesanal com bacon crocante, queijo cheddar, alface e tomate',
-    price: 28.9,
-    category: 'Hambúrgueres',
-    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop',
-    status: true,
-  },
-  {
-    id: 2,
-    name: 'Pizza Calabresa',
-    description: 'Molho de tomate, mussarela, calabresa fatiada e cebola',
-    price: 45.0,
-    category: 'Pizzas',
-    image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop',
-    status: true,
-  },
-  {
-    id: 3,
-    name: 'Refrigerante Lata',
-    description: 'Coca-Cola, Guaraná ou Fanta - 350ml',
-    price: 5.5,
-    category: 'Bebidas',
-    image: 'https://images.unsplash.com/photo-1629203851122-3726ecdf080e?w=200&h=200&fit=crop',
-    status: true,
-  },
-  {
-    id: 4,
-    name: 'Batata Frita Grande',
-    description: 'Porção de batata frita crocante (500g)',
-    price: 18.0,
-    category: 'Acompanhamentos',
-    image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=200&h=200&fit=crop',
-    status: true,
-  },
-  {
-    id: 5,
-    name: 'Pudim de Leite',
-    description: 'Pudim caseiro com calda de caramelo',
-    price: 12.0,
-    category: 'Sobremesas',
-    image:
-      'https://images.unsplash.com/photo-1702728109878-c61a98d80491?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170',
-    status: true,
-  },
-  {
-    id: 6,
-    name: 'X-Tudo',
-    description: 'Hambúrguer completo com bacon, ovo, presunto, queijo e salada',
-    price: 35.9,
-    category: 'Hambúrgueres',
-    image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=200&h=200&fit=crop',
-    status: true,
-  },
-  {
-    id: 7,
-    name: 'Pizza Quatro Queijos',
-    description: 'Mussarela, provolone, gorgonzola e parmesão',
-    price: 52.0,
-    category: 'Pizzas',
-    image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200&h=200&fit=crop',
-    status: false,
-  },
-  {
-    id: 8,
-    name: 'Suco Natural',
-    description: 'Laranja, limão ou maracujá - 500ml',
-    price: 8.0,
-    category: 'Bebidas',
-    image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=200&h=200&fit=crop',
-    status: true,
-  },
-])
+const products = ref([])
+const loading = ref(false)
+const categoriesMap = ref({})
+
+const pagination = ref({
+  page: 1,
+  rowsPerPage: 20,
+  rowsNumber: 0,
+})
 
 const filters = ref({
   search: '',
@@ -289,46 +227,170 @@ const filters = ref({
   status: null,
 })
 
-const filteredProducts = computed(() => {
-  let result = [...products.value]
+const categoryOptions = computed(() =>
+  Object.values(categoriesMap.value).map((c) => ({ label: c.name, value: c.uuid }))
+)
 
-  if (filters.value.search) {
-    const search = filters.value.search.toLowerCase()
-    result = result.filter(
-      (p) => p.name.toLowerCase().includes(search) || p.description.toLowerCase().includes(search),
-    )
+const parseCategoryDesc = (desc) => {
+  if (!desc) return {}
+  try {
+    return JSON.parse(desc)
+  } catch {
+    return {}
   }
-
-  if (filters.value.category) {
-    result = result.filter((p) => p.category === filters.value.category)
-  }
-
-  if (filters.value.status !== null) {
-    result = result.filter((p) => p.status === filters.value.status)
-  }
-
-  return result
-})
-
-const getCategoryColor = (category) => {
-  const colors = {
-    Hambúrgueres: 'orange',
-    Pizzas: 'red',
-    Bebidas: 'blue',
-    Sobremesas: 'pink',
-    Acompanhamentos: 'purple',
-  }
-  return colors[category] || 'grey'
 }
 
-const handleToggleStatus = (product) => {
-  product.status = !product.status
-  $q.notify({
-    message: `Produto ${product.status ? 'ativado' : 'desativado'} com sucesso`,
-    color: product.status ? 'positive' : 'orange',
-    icon: product.status ? 'check_circle' : 'info',
-    position: 'top-right',
-    timeout: 1500,
+const mapApiProduct = (prod) => {
+  const firstCategory = prod.categories?.[0]
+  const parsedDesc = firstCategory ? parseCategoryDesc(firstCategory.description) : {}
+  return {
+    uuid: prod.uuid,
+    name: prod.name,
+    description: prod.description,
+    price: prod.price,
+    image: prod.image_url,
+    status: prod.status === 'active',
+    category: firstCategory?.name || '',
+    categoryColor: parsedDesc.color || 'grey',
+  }
+}
+
+const fetchProducts = async () => {
+  loading.value = true
+  try {
+    const params = {
+      page: pagination.value.page,
+      limit: pagination.value.rowsPerPage,
+    }
+    if (filters.value.search) params.name = filters.value.search
+    if (filters.value.category) params.category_id = filters.value.category
+
+    const resp = await ProductService.getAll(params)
+    const data = resp?.data || resp || {}
+    const apiProducts = data.products || []
+    products.value = (Array.isArray(apiProducts) ? apiProducts : []).map(mapApiProduct)
+    pagination.value.rowsNumber = data.total || 0
+  } catch {
+    notifyError('Erro ao carregar produtos')
+  } finally {
+    loading.value = false
+  }
+}
+
+const onTableRequest = async ({ pagination: { page, rowsPerPage } }) => {
+  pagination.value.page = page
+  pagination.value.rowsPerPage = rowsPerPage
+  await fetchProducts()
+}
+
+let searchTimeout = null
+watch(
+  () => filters.value.search,
+  () => {
+    clearTimeout(searchTimeout)
+    searchTimeout = setTimeout(() => {
+      pagination.value.page = 1
+      fetchProducts()
+    }, 400)
+  },
+)
+
+watch(
+  () => filters.value.category,
+  () => {
+    pagination.value.page = 1
+    fetchProducts()
+  },
+)
+
+// status is not supported server-side — filter the current page only
+const displayedProducts = computed(() => {
+  if (filters.value.status === null || filters.value.status === undefined) return products.value
+  return products.value.filter((p) => p.status === filters.value.status)
+})
+
+onMounted(async () => {
+  showLoading()
+  try {
+    const categoriesResp = await CategoryService.getAll()
+    const apiCategories = categoriesResp?.data?.categories || categoriesResp?.data || categoriesResp || []
+    const catMap = {}
+    ;(Array.isArray(apiCategories) ? apiCategories : []).forEach((cat) => {
+      const parsed = parseCategoryDesc(cat.description)
+      catMap[cat.name] = {
+        uuid: cat.uuid,
+        name: cat.name,
+        color: parsed.color || 'grey',
+        icon: parsed.icon || 'category',
+      }
+    })
+    categoriesMap.value = catMap
+  } catch {
+    notifyError('Erro ao carregar categorias')
+  } finally {
+    hideLoading()
+  }
+  await fetchProducts()
+})
+
+const getCategoryColor = (categoryName) => {
+  return categoriesMap.value[categoryName]?.color || 'grey'
+}
+
+const handleToggleStatus = async (product) => {
+  const newStatus = !product.status
+  const confirmed = await confirm({
+    title: newStatus ? 'Ativar produto' : 'Desativar produto',
+    message: `Deseja realmente ${newStatus ? 'ativar' : 'desativar'} o produto "<b>${product.name}</b>"?`,
+    okLabel: newStatus ? 'Ativar' : 'Desativar',
+    okColor: newStatus ? 'positive' : 'negative',
+  })
+  if (!confirmed) return
+
+  const statusStr = newStatus ? 'active' : 'inactive'
+  showLoading()
+  try {
+    await ProductService.updateStatus(product.uuid, statusStr)
+    product.status = newStatus
+    notifySuccess(`Produto ${newStatus ? 'ativado' : 'desativado'} com sucesso`)
+  } catch {
+    notifyError('Erro ao atualizar status do produto')
+  } finally {
+    hideLoading()
+  }
+}
+
+const handleEditProduct = (product) => {
+  router.push(`/produtos/${product.uuid}`)
+}
+
+const handleDeleteProduct = (product) => {
+  $q.dialog({
+    title: 'Confirmar Exclusão',
+    message: `Tem certeza que deseja excluir o produto "${product.name}"?`,
+    cancel: {
+      label: 'Cancelar',
+      flat: true,
+      color: 'grey-7',
+    },
+    ok: {
+      label: 'Excluir',
+      color: 'negative',
+      unelevated: true,
+    },
+    persistent: true,
+  }).onOk(async () => {
+    showLoading()
+    try {
+      await ProductService.remove(product.uuid)
+      const index = products.value.findIndex((p) => p.uuid === product.uuid)
+      if (index !== -1) products.value.splice(index, 1)
+      notifySuccess('Produto excluído com sucesso')
+    } catch {
+      notifyError('Erro ao excluir produto')
+    } finally {
+      hideLoading()
+    }
   })
 }
 </script>

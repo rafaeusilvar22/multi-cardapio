@@ -7,7 +7,7 @@
           <div>
             <div class="text-h5 text-weight-bold">Pedido #{{ order.id }}</div>
             <div class="text-subtitle2 text-white" style="opacity: 0.9">
-              {{ order.customer }}
+              Mesa {{ order.table_number }}
             </div>
           </div>
           <q-btn flat round dense icon="close" color="white" @click="dialog = false" size="md" />
@@ -35,7 +35,6 @@
             <div class="info-content">
               <div class="info-label">Horário</div>
               <div class="info-value">{{ order.time }}</div>
-              <div class="info-subtitle">{{ order.elapsed_time }}</div>
             </div>
           </div>
 
@@ -50,31 +49,31 @@
             </div>
           </div>
 
-          <!-- Tipo de Pedido -->
-          <div class="info-item full-width">
+          <!-- Tipo de pedido -->
+          <div class="info-item">
+            <div class="info-icon-wrapper" :class="orderTypeStyle.bg">
+              <q-icon :name="orderTypeStyle.icon" size="24px" :color="orderTypeStyle.color" />
+            </div>
+            <div class="info-content">
+              <div class="info-label">Tipo</div>
+              <div class="info-value">{{ orderTypeStyle.label }}</div>
+            </div>
+          </div>
+
+          <!-- Origem -->
+          <div class="info-item">
             <div class="info-icon-wrapper bg-purple-1">
               <q-icon
-                :name="order.order_type === 'delivery' ? 'delivery_dining' : 'storefront'"
+                :name="order.origin === 'menu' ? 'qr_code_2' : 'admin_panel_settings'"
                 size="24px"
                 color="purple"
               />
             </div>
             <div class="info-content">
-              <div class="info-label">Tipo de Pedido</div>
+              <div class="info-label">Origem</div>
               <div class="info-value">
-                {{ order.order_type === 'delivery' ? 'Entrega' : 'Retirada no local' }}
+                {{ order.origin === 'menu' ? 'Cardápio Digital' : 'Administrativo' }}
               </div>
-            </div>
-          </div>
-
-          <!-- Endereço -->
-          <div v-if="order.address" class="info-item full-width">
-            <div class="info-icon-wrapper bg-red-1">
-              <q-icon name="place" size="24px" color="red" />
-            </div>
-            <div class="info-content">
-              <div class="info-label">Endereço</div>
-              <div class="info-value">{{ order.address }}</div>
             </div>
           </div>
         </div>
@@ -86,13 +85,57 @@
       <q-card-section class="q-pa-md q-pt-none">
         <div class="text-subtitle1 text-weight-medium q-mb-sm">Detalhes</div>
 
+        <!-- Endereço de entrega -->
+        <div v-if="order.order_type?.type === 'delivery' && order.order_type?.delivery_address" class="detail-box q-mb-sm">
+          <div class="detail-header">
+            <q-icon name="delivery_dining" size="18px" color="orange" />
+            <span class="text-weight-medium">Endereço de Entrega</span>
+          </div>
+          <div class="detail-content">
+            <div>{{ order.order_type.delivery_address }}</div>
+            <div v-if="order.order_type.delivery_latitude && order.order_type.delivery_longitude" class="q-mt-xs">
+              <a
+                :href="`https://www.google.com/maps?q=${order.order_type.delivery_latitude},${order.order_type.delivery_longitude}`"
+                target="_blank"
+                class="text-primary"
+              >
+                <q-icon name="map" size="13px" /> Ver no mapa
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cliente -->
+        <div v-if="order.customer" class="detail-box q-mb-sm">
+          <div class="detail-header">
+            <q-icon name="person" size="18px" color="teal" />
+            <span class="text-weight-medium">Cliente</span>
+          </div>
+          <div class="detail-content">
+            <div>{{ order.customer.name }}</div>
+            <div class="text-grey-6">
+              <q-icon name="phone" size="12px" /> {{ order.customer.phone }}
+            </div>
+            <div v-if="order.customer.email" class="text-grey-6">
+              <q-icon name="email" size="12px" /> {{ order.customer.email }}
+            </div>
+          </div>
+        </div>
+
         <!-- Itens do Pedido -->
-        <div class="detail-box q-mb-sm">
+        <div v-if="order.items_list?.length" class="detail-box q-mb-sm">
           <div class="detail-header">
             <q-icon name="list_alt" size="18px" color="primary" />
             <span class="text-weight-medium">Itens do Pedido</span>
           </div>
-          <div class="detail-content">{{ order.description }}</div>
+          <div
+            v-for="item in order.items_list"
+            :key="item.id"
+            class="detail-content"
+          >
+            {{ item.quantity }}x — {{ formatCurrency(parseFloat(item.unit_price)) }} un
+            <span v-if="item.notes" class="text-grey-6"> ({{ item.notes }})</span>
+          </div>
         </div>
 
         <!-- Observações -->
@@ -118,7 +161,7 @@
           <div class="row items-center justify-between">
             <div class="text-h6 text-weight-bold">Total</div>
             <div class="text-h5 text-weight-bold text-positive">
-              R$ {{ order.total.toFixed(2) }}
+              {{ formatCurrency(order.total) }}
             </div>
           </div>
         </div>
@@ -128,6 +171,9 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { formatCurrency } from 'src/utils/globalFunctions'
+
 const dialog = defineModel({
   type: Boolean,
   default: false,
@@ -140,34 +186,37 @@ const { order } = defineProps({
   },
 })
 
+const orderTypeStyle = computed(() => {
+  const type = order.order_type?.type
+  if (type === 'pickup') return { icon: 'store', color: 'teal', bg: 'bg-teal-1', label: 'Retirada no local' }
+  if (type === 'delivery') return { icon: 'delivery_dining', color: 'orange', bg: 'bg-orange-1', label: 'Delivery' }
+  return { icon: 'table_restaurant', color: 'primary', bg: 'bg-blue-1', label: `Mesa ${order.order_type?.table_number || '-'}` }
+})
+
 const getStatusColor = (status) => {
-  switch (status) {
-    case 'preparing':
-      return 'warning'
-    case 'confirmed':
-      return 'info'
-    case 'delivering':
-      return 'orange'
-    case 'delivered':
-      return 'positive'
-    default:
-      return 'grey'
+  const colors = {
+    pending: 'grey',
+    confirmed: 'info',
+    preparing: 'warning',
+    ready: 'teal',
+    delivering: 'orange',
+    delivered: 'positive',
+    cancelled: 'negative',
   }
+  return colors[status] || 'grey'
 }
 
 const getStatusLabel = (status) => {
-  switch (status) {
-    case 'preparing':
-      return 'Preparando'
-    case 'confirmed':
-      return 'Confirmado'
-    case 'delivering':
-      return 'Em Entrega'
-    case 'delivered':
-      return 'Entregue'
-    default:
-      return 'Desconhecido'
+  const labels = {
+    pending: 'Pendente',
+    confirmed: 'Confirmado',
+    preparing: 'Preparando',
+    ready: 'Pronto',
+    delivering: 'Em Entrega',
+    delivered: 'Entregue',
+    cancelled: 'Cancelado',
   }
+  return labels[status] || status
 }
 </script>
 
@@ -221,12 +270,6 @@ const getStatusLabel = (status) => {
   font-weight: 600;
   color: #333;
   line-height: 1.3;
-}
-
-.info-subtitle {
-  font-size: 0.75rem;
-  color: #999;
-  font-weight: 400;
 }
 
 .detail-box {
