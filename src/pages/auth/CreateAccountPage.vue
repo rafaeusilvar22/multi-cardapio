@@ -334,20 +334,20 @@ const authStore = useAuthStore()
 const { notifyError, notifySuccess } = useNotify()
 
 const form = ref({
-  first_name: 'Rafael',
-  last_name: 'Silva',
-  email: 'rafaelsilvaaraujo@ig.com.br',
-  phone: '91985751211',
-  password: 'Rafael22*',
-  confirm_password: 'Rafael22*',
-  group_name: 'ABC',
-  neighborhood: 'Centro',
-  zip_code: '89015200',
-  address: 'Rua das Palmeiras',
-  number: '11',
-  complement: 'Sala 10',
-  city: 'Rio de Janeiro',
-  state: 'RJ',
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone: '',
+  password: '',
+  confirm_password: '',
+  group_name: '',
+  neighborhood: '',
+  zip_code: '',
+  address: '',
+  number: '',
+  complement: '',
+  city: '',
+  state: '',
 })
 
 const currentStep = ref(1)
