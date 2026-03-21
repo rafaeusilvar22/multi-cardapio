@@ -2,6 +2,7 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       { path: '', name: 'dashboard', component: () => import('src/pages/Management/DashboardPage.vue') },
       { path: 'pedidos', name: 'pedidos', component: () => import('src/pages/Management/OrdersPage.vue') },
