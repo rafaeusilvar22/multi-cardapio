@@ -6,4 +6,5 @@ export const API_ENDPOINTS = {
   ORDERS: '/orders',
   GROUPS: '/workspaces',
   PUBLIC: '/public',
+  ADMIN: '/admin',
 }

@@ -94,4 +94,26 @@ export const EstablishmentService = {
       throw errorsMiddleware(error)
     }
   },
+
+  async uploadLogo(uuid, file) {
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const resp = await api.post(`${BASE}/${uuid}/upload/logo`, formData)
+      return resp.data
+    } catch (error) {
+      throw errorsMiddleware(error)
+    }
+  },
+
+  async uploadBanner(uuid, file) {
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const resp = await api.post(`${BASE}/${uuid}/upload/banner`, formData)
+      return resp.data
+    } catch (error) {
+      throw errorsMiddleware(error)
+    }
+  },
 }

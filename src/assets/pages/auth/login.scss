@@ -3,6 +3,10 @@
   background: #ffffff;
 }
 
+.body--dark .rs-login-page {
+  background: #121212;
+}
+
 /* Image Section */
 .rs-login-image-section {
   background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80');
@@ -73,6 +77,10 @@
   &:hover {
     opacity: 0.8;
   }
+}
+
+.body--dark .rs-login-form-section {
+  background: #1a1a1a;
 }
 
 /* Mobile */

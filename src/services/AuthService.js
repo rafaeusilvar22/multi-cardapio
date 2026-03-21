@@ -44,5 +44,23 @@ export const AuthService = {
     } catch (error) {
       throw errorsMiddleware(error);
     }
-  }
+  },
+
+  async forgotPassword(email) {
+    try {
+      const resp = await api.post(`${USER}/forgot-password`, { email });
+      return resp.data;
+    } catch (error) {
+      throw errorsMiddleware(error);
+    }
+  },
+
+  async resetPassword(payload) {
+    try {
+      const resp = await api.post(`${USER}/reset-password`, payload);
+      return resp.data;
+    } catch (error) {
+      throw errorsMiddleware(error);
+    }
+  },
 };

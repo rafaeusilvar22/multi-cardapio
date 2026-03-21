@@ -37,9 +37,14 @@ export default defineRouter(function (/* { store, ssrContext } */) {
   Router.beforeEach((to) => {
     const authStore = useAuthStore()
     const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+    const requiresSuperAdmin = to.matched.some((record) => record.meta.requiresSuperAdmin)
 
     if (requiresAuth && !authStore.isAuthenticated) {
       return { name: 'login' }
+    }
+
+    if (requiresSuperAdmin && authStore.profile?.type !== 'super-admin') {
+      return { name: 'dashboard' }
     }
 
     if ((to.name === 'login' || to.name === 'criar-conta') && authStore.isAuthenticated) {

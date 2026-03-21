@@ -3,10 +3,10 @@
 
 import { defineConfig } from '#q-app/wrappers'
 import { fileURLToPath } from 'node:url'
-import dotenv from "dotenv";
+import dotenv from 'dotenv'
 
 export default defineConfig((ctx) => {
-  const env = dotenv.config().parsed; // Load .env variables
+  const env = dotenv.config().parsed // Load .env variables
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
@@ -113,8 +113,8 @@ export default defineConfig((ctx) => {
           negative: '#C62828',
           info: '#31CCEC',
           warning: '#F2C037',
-          background: '#FAFAFA'
-        }
+          background: '#FAFAFA',
+        },
       },
 
       // iconSet: 'material-icons', // Quasar icon set
@@ -128,7 +128,7 @@ export default defineConfig((ctx) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: ["Loading", "Notify", "Dialog", "Dark"],
+      plugins: ['Loading', 'Notify', 'Dialog', 'Dark'],
     },
 
     // animations: 'all', // --- includes all animations

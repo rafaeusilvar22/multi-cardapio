@@ -263,6 +263,10 @@ const getStatusLabel = (status) => {
   text-transform: uppercase;
   letter-spacing: 0.3px;
   margin-bottom: 2px;
+
+  .body--dark & {
+    color: #9e9e9e;
+  }
 }
 
 .info-value {
@@ -270,6 +274,10 @@ const getStatusLabel = (status) => {
   font-weight: 600;
   color: #333;
   line-height: 1.3;
+
+  .body--dark & {
+    color: #e0e0e0;
+  }
 }
 
 .detail-box {
@@ -277,6 +285,11 @@ const getStatusLabel = (status) => {
   border-radius: 8px;
   padding: 10px 12px;
   border-left: 3px solid #e0e0e0;
+
+  .body--dark & {
+    background: #2a2a2a;
+    border-left-color: #444;
+  }
 }
 
 .detail-header {
@@ -292,6 +305,10 @@ const getStatusLabel = (status) => {
   color: #555;
   line-height: 1.4;
   padding-left: 24px;
+
+  .body--dark & {
+    color: #bdbdbd;
+  }
 }
 
 .total-box {
@@ -299,5 +316,10 @@ const getStatusLabel = (status) => {
   border-radius: 10px;
   padding: 14px 16px;
   border: 2px solid #bae6fd;
+
+  .body--dark & {
+    background: linear-gradient(135deg, #0d2137 0%, #0a1929 100%);
+    border-color: #1565c0;
+  }
 }
 </style>

@@ -85,7 +85,9 @@
                 <q-item-section>
                   <q-item-label class="text-caption text-grey-5">E-mail</q-item-label>
                   <q-item-label>
-                    <a class="text-primary text-caption" :href="`mailto:${userEmail}`">{{ userEmail }}</a>
+                    <a class="text-primary text-caption" :href="`mailto:${userEmail}`">{{
+                      userEmail
+                    }}</a>
                   </q-item-label>
                 </q-item-section>
               </q-item>
@@ -137,7 +139,7 @@
       :breakpoint="500"
       show-if-above
       v-model="leftDrawerOpen"
-      :style="isDark ? 'background: #1F1F1F' : ''"
+      :style="isDark ? 'background: #1a1a1a; border-right: 1px solid #2a2a2a' : ''"
       @mouseenter="miniState = false"
       @mouseleave="miniState = true"
     >
@@ -165,7 +167,13 @@
             </q-item-section>
             <q-item-section
               class="rs-l-regular"
-              :class="$route.name === menuItem.route ? 'text-primary text-weight-medium' : 'text-grey-7'"
+              :class="
+                $route.name === menuItem.route
+                  ? 'text-primary text-weight-medium'
+                  : isDark
+                    ? 'text-grey-4'
+                    : 'text-grey-7'
+              "
             >
               {{ menuItem.label }}
             </q-item-section>
@@ -205,11 +213,10 @@ const leftDrawerOpen = ref(false)
 const miniState = ref(true)
 
 const DARK_MODE_KEY = 'darkMode'
-const isDark = ref(Dark.isActive)
+const isDark = computed(() => Dark.isActive)
 
 function toggleDark() {
   Dark.toggle()
-  isDark.value = Dark.isActive
   localStorage.setItem(DARK_MODE_KEY, Dark.isActive ? '1' : '0')
   applyColors()
 }
@@ -253,7 +260,6 @@ function applyColors() {
 }
 
 onMounted(() => {
-  isDark.value = Dark.isActive
   startPolling()
 })
 
@@ -267,13 +273,31 @@ function updateTitle() {
 }
 watch([groupName, newOrdersCount], updateTitle, { immediate: true })
 
-const menuList = [
+watch(
+  groupLogo,
+  (url) => {
+    if (!url) return
+    const link = document.getElementById('dynamic-favicon')
+    if (link) link.href = url
+  },
+  { immediate: true },
+)
+
+const isSuperAdmin = computed(() => authStore.profile?.type === 'super-admin')
+
+const ownerMenuList = [
   { label: 'Início', icon: 'fa-solid fa-house', route: 'dashboard' },
   { label: 'Pedidos', icon: 'fa-solid fa-utensils', route: 'pedidos' },
   { label: 'Produtos', icon: 'fa-solid fa-burger', route: 'produtos' },
   { label: 'Categoria', icon: 'fa-solid fa-layer-group', route: 'categorias' },
   { label: 'Ajustes', icon: 'fa-solid fa-gear', route: 'configuracoes-estabelecimento' },
 ]
+
+const adminMenuList = [
+  { label: 'Estabelecimentos', icon: 'fa-solid fa-store', route: 'admin-workspaces' },
+]
+
+const menuList = computed(() => (isSuperAdmin.value ? adminMenuList : ownerMenuList))
 
 const handleLogout = async () => {
   await authStore.logout()
@@ -297,8 +321,9 @@ function toggleLeftDrawer() {
 }
 
 .rs-header--dark {
-  background: #1f1f1f;
-  border-bottom-color: #333333;
+  background: #1a1a1a;
+  border-bottom-color: #2a2a2a;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* Toolbar */
@@ -403,7 +428,19 @@ function toggleLeftDrawer() {
 }
 
 .rs-menu-item--active {
-  background: rgba(var(--q-primary-rgb, 229, 57, 53), 0.1) !important;
+  background: rgba(var(--q-primary-rgb, 229, 57, 53), 0.12) !important;
   border-left: 3px solid var(--q-primary);
+}
+
+:global(.body--dark) .rs-menu-item--active {
+  background: rgba(239, 154, 154, 0.15) !important;
+}
+
+:global(.body--dark) .rs-menu-item:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+:global(.body--dark) .rs-user-dropdown:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
 }
 </style>

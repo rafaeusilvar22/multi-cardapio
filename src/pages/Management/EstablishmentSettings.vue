@@ -90,6 +90,55 @@
                         </div>
                       </div>
 
+                      <!-- Banner -->
+                      <div>
+                        <div class="text-subtitle2 text-weight-medium q-mb-sm">
+                          Banner do Estabelecimento
+                        </div>
+                        <div class="banner-preview-wrapper">
+                          <q-img
+                            v-if="infoForm.banner"
+                            :src="infoForm.banner"
+                            class="banner-preview"
+                            fit="cover"
+                          >
+                            <div class="absolute-bottom-right q-pa-sm">
+                              <q-btn
+                                round
+                                dense
+                                size="sm"
+                                color="negative"
+                                icon="close"
+                                @click="infoForm.banner = null; bannerFile = null"
+                              >
+                                <q-tooltip>Remover banner</q-tooltip>
+                              </q-btn>
+                            </div>
+                          </q-img>
+                          <div v-else class="banner-placeholder">
+                            <q-icon name="panorama" size="48px" color="grey-5" />
+                            <div class="text-caption text-grey-6 q-mt-sm">Nenhum banner</div>
+                          </div>
+                        </div>
+
+                        <q-file
+                          v-model="bannerFile"
+                          outlined
+                          dense
+                          label="Escolher banner"
+                          accept="image/*"
+                          @update:model-value="handleBannerUpload"
+                          class="q-mt-md"
+                        >
+                          <template v-slot:prepend>
+                            <q-icon name="cloud_upload" />
+                          </template>
+                        </q-file>
+                        <div class="text-caption text-grey-6 q-mt-xs">
+                          Formatos: PNG, JPG (Recomendado: 1200x400px)
+                        </div>
+                      </div>
+
                       <q-input
                         v-model="infoForm.name"
                         outlined
@@ -119,6 +168,17 @@
                         placeholder="contato@restaurante.com"
                       >
                         <template v-slot:prepend><q-icon name="email" /></template>
+                      </q-input>
+
+                      <q-input
+                        v-model="infoForm.about"
+                        outlined
+                        type="textarea"
+                        label="Sobre o estabelecimento"
+                        placeholder="Conte um pouco sobre a história, especialidades e diferenciais do seu estabelecimento..."
+                        autogrow
+                      >
+                        <template v-slot:prepend><q-icon name="info" /></template>
                       </q-input>
                     </div>
                   </div>
@@ -528,6 +588,7 @@ const authStore = useAuthStore()
 const activeTab = ref('info')
 const infoFormRef = ref(null)
 const logoFile = ref(null)
+const bannerFile = ref(null)
 
 const syncStore = async () => {
   try {
@@ -544,8 +605,10 @@ const syncStore = async () => {
 // ─── Tab 1 — Informações ────────────────────────────────────────────────────
 const infoForm = ref({
   logo: null,
+  banner: null,
   name: '',
   description: '',
+  about: '',
   phone: '',
   email: '',
   type_of_service: '',
@@ -567,9 +630,11 @@ const applyGroupToForm = (group) => {
   if (!group) return
   infoForm.value.name = group.name || ''
   infoForm.value.description = group.description || ''
+  infoForm.value.about = group.about || ''
   infoForm.value.phone = group.phone || ''
   infoForm.value.email = group.email || ''
   infoForm.value.logo = group.logo || null
+  infoForm.value.banner = group.banner || null
   infoForm.value.type_of_service = group.type_of_service || ''
   infoForm.value.document_type = group.document_type || ''
   infoForm.value.document_number = group.document_number || ''
@@ -583,14 +648,42 @@ const applyGroupToForm = (group) => {
   infoForm.value.address.cep = group.address_zipcode || ''
 }
 
-const handleLogoUpload = (file) => {
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      infoForm.value.logo = e.target.result
-    }
-    reader.readAsDataURL(file)
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+
+const handleBannerUpload = (file) => {
+  if (!file) return
+
+  if (!file.type.startsWith('image/')) {
+    notifyError('Apenas imagens são permitidas.')
+    bannerFile.value = null
+    return
   }
+
+  if (file.size > MAX_FILE_SIZE) {
+    notifyError('A imagem deve ter no máximo 5MB.')
+    bannerFile.value = null
+    return
+  }
+
+  infoForm.value.banner = URL.createObjectURL(file)
+}
+
+const handleLogoUpload = (file) => {
+  if (!file) return
+
+  if (!file.type.startsWith('image/')) {
+    notifyError('Apenas imagens são permitidas.')
+    logoFile.value = null
+    return
+  }
+
+  if (file.size > MAX_FILE_SIZE) {
+    notifyError('A imagem deve ter no máximo 5MB.')
+    logoFile.value = null
+    return
+  }
+
+  infoForm.value.logo = URL.createObjectURL(file)
 }
 
 const handleSaveInfo = async () => {
@@ -605,13 +698,23 @@ const handleSaveInfo = async () => {
 
   showLoading()
   try {
+    if (logoFile.value) {
+      await EstablishmentService.uploadLogo(groupUuid, logoFile.value)
+      logoFile.value = null
+    }
+
+    if (bannerFile.value) {
+      await EstablishmentService.uploadBanner(groupUuid, bannerFile.value)
+      bannerFile.value = null
+    }
+
     await EstablishmentService.updateSettings(groupUuid, {
       group: {
         name: infoForm.value.name,
         description: infoForm.value.description,
+        about: infoForm.value.about,
         phone: infoForm.value.phone,
         email: infoForm.value.email,
-        logo: infoForm.value.logo,
         type_of_service: infoForm.value.type_of_service,
         document_type: infoForm.value.document_type,
         document_number: infoForm.value.document_number,
@@ -826,6 +929,11 @@ onMounted(async () => {
   overflow: hidden;
   border: 2px dashed #e0e0e0;
   background: white;
+
+  .body--dark & {
+    background: #1e1e1e;
+    border-color: #444;
+  }
 }
 
 .logo-preview {
@@ -843,6 +951,44 @@ onMounted(async () => {
   justify-content: center;
   background: #f5f5f5;
   border-radius: 10px;
+
+  .body--dark & {
+    background: #2a2a2a;
+  }
+}
+
+.banner-preview-wrapper {
+  width: 100%;
+  height: 140px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px dashed #e0e0e0;
+  background: white;
+
+  .body--dark & {
+    background: #1e1e1e;
+    border-color: #444;
+  }
+}
+
+.banner-preview {
+  width: 100%;
+  height: 100%;
+}
+
+.banner-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  border-radius: 10px;
+
+  .body--dark & {
+    background: #2a2a2a;
+  }
 }
 
 .working-hour-item {
@@ -920,5 +1066,9 @@ onMounted(async () => {
 
 .color-preview-body {
   background: #fff;
+
+  .body--dark & {
+    background: #1e1e1e;
+  }
 }
 </style>

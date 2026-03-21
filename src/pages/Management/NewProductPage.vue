@@ -283,7 +283,7 @@ const loadProduct = async (uuid) => {
     form.value = {
       name: prod.name,
       description: prod.description,
-      price: prod.price,
+      price: Number(prod.price),
       category: prod.categories?.[0]?.id || null,
       image: prod.image_url,
       status: prod.is_available,
@@ -295,14 +295,24 @@ const loadProduct = async (uuid) => {
   }
 }
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+
 const handleImageUpload = (file) => {
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      form.value.image = e.target.result
-    }
-    reader.readAsDataURL(file)
+  if (!file) return
+
+  if (!file.type.startsWith('image/')) {
+    notifyError('Apenas imagens são permitidas.')
+    imageFile.value = null
+    return
   }
+
+  if (file.size > MAX_FILE_SIZE) {
+    notifyError('A imagem deve ter no máximo 5MB.')
+    imageFile.value = null
+    return
+  }
+
+  form.value.image = URL.createObjectURL(file)
 }
 
 const handleSubmit = async () => {
@@ -313,20 +323,26 @@ const handleSubmit = async () => {
     prod_name: form.value.name,
     prod_description: form.value.description,
     prod_price: form.value.price,
-    prod_image_url: form.value.image,
     prod_is_available: form.value.status,
     category_ids: form.value.category ? [form.value.category] : [],
   }
 
   showLoading()
   try {
+    let uuid = productUuid.value
+
     if (mode.value === 'create') {
-      await ProductService.create(apiData)
-      notifySuccess('Produto cadastrado com sucesso!')
+      const resp = await ProductService.create(apiData)
+      uuid = resp?.product?.uuid
     } else {
-      await ProductService.update(productUuid.value, apiData)
-      notifySuccess('Produto atualizado com sucesso!')
+      await ProductService.update(uuid, apiData)
     }
+
+    if (imageFile.value && uuid) {
+      await ProductService.uploadImage(uuid, imageFile.value)
+    }
+
+    notifySuccess(mode.value === 'create' ? 'Produto cadastrado com sucesso!' : 'Produto atualizado com sucesso!')
     router.push('/produtos')
   } catch {
     notifyError(
@@ -371,6 +387,10 @@ const handleCancel = () => {
   border-radius: 12px;
   overflow: hidden;
   border: 2px dashed #e0e0e0;
+
+  .body--dark & {
+    border-color: #444;
+  }
 }
 
 .image-preview {
@@ -388,6 +408,10 @@ const handleCancel = () => {
   justify-content: center;
   background: #f5f5f5;
   border-radius: 10px;
+
+  .body--dark & {
+    background: #2a2a2a;
+  }
 }
 
 .status-section {
@@ -395,5 +419,10 @@ const handleCancel = () => {
   border-radius: 8px;
   padding: 16px;
   border-left: 3px solid #e0e0e0;
+
+  .body--dark & {
+    background: #2a2a2a;
+    border-left-color: #444;
+  }
 }
 </style>

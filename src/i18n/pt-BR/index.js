@@ -113,4 +113,38 @@ export default {
   'There is already an account associated with this email.': 'Já existe uma conta associada a este e-mail.',
   "An unexpected error has occurred. Please try again later.": "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.",
   "Warning": "Aviso",
+
+  // API — autenticação
+  "Invalid or expired token.": "Token inválido ou expirado.",
+  "Token expired.": "Sessão expirada. Por favor, faça login novamente.",
+  "Invalid token.": "Token inválido. Por favor, faça login novamente.",
+  "Invalid credentials.": "E-mail ou senha inválidos.",
+  "Invalid email or password.": "E-mail ou senha inválidos.",
+
+  // API — acesso
+  "Access restricted to super administrators.": "Acesso restrito a super administradores.",
+  "Access restricted to workspace owner or administrator.": "Acesso restrito ao proprietário ou administrador do estabelecimento.",
+
+  // API — workspaces (admin)
+  "Workspace not found.": "Estabelecimento não encontrado.",
+  "A workspace with this document number already exists.": "Já existe um estabelecimento com este CNPJ.",
+  "A workspace with this domain URL already exists.": "Já existe um estabelecimento com este domínio.",
+  "Cannot change the status of a super admin.": "Não é possível alterar o status de um super administrador.",
+
+  // API — usuários
+  "User not found.": "Usuário não encontrado.",
+  "Email already in use.": "Este e-mail já está em uso.",
+
+  // API — status inválido
+  "Invalid status.": "Status inválido.",
+
+  // API — pedidos
+  "Order not found.": "Pedido não encontrado.",
+  "Order already cancelled.": "Pedido já foi cancelado.",
+
+  // API — produtos
+  "Product not found.": "Produto não encontrado.",
+
+  // API — categorias
+  "Category not found.": "Categoria não encontrada.",
 }

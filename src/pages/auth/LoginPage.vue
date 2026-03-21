@@ -60,7 +60,9 @@
                   />
                 </template>
               </q-input>
-              <div class="rs-login-forgot-link q-mt-xs">Esqueci minha senha</div>
+              <router-link :to="{ name: 'forgot-password' }" class="rs-login-forgot-link q-mt-xs">
+                Esqueci minha senha
+              </router-link>
             </div>
 
             <q-btn

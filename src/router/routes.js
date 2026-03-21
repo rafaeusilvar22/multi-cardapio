@@ -14,6 +14,10 @@ const routes = [
       { path: 'categorias/:uuid', name: 'editar-categoria', component: () => import('src/pages/Management/NewCategoryPage.vue') },
       { path: 'configuracoes-estabelecimento', name: 'configuracoes-estabelecimento', component: () => import('src/pages/Management/EstablishmentSettings.vue') },
 
+      // Super-admin routes
+      { path: 'admin/estabelecimentos', name: 'admin-workspaces', component: () => import('src/pages/Admin/WorkspacesPage.vue'), meta: { requiresSuperAdmin: true } },
+      { path: 'admin/estabelecimentos/novo', name: 'admin-workspace-create', component: () => import('src/pages/Admin/CreateWorkspacePage.vue'), meta: { requiresSuperAdmin: true } },
+      { path: 'admin/estabelecimentos/:uuid', name: 'admin-workspace-detail', component: () => import('src/pages/Admin/WorkspaceDetailPage.vue'), meta: { requiresSuperAdmin: true } },
     ],
   },
   {
@@ -29,6 +33,16 @@ const routes = [
         path: 'login',
         name: 'login',
         component: () => import('src/pages/auth/LoginPage.vue'),
+      },
+      {
+        path: 'esqueci-minha-senha',
+        name: 'forgot-password',
+        component: () => import('src/pages/auth/ForgotPasswordPage.vue'),
+      },
+      {
+        path: 'redefinir-senha',
+        name: 'reset-password',
+        component: () => import('src/pages/auth/ResetPasswordPage.vue'),
       },
     ],
   },

@@ -2,20 +2,7 @@ import { defineBoot } from '#q-app/wrappers'
 import { setCssVar, Dark } from 'quasar'
 import { useAuthStore } from 'src/stores/auth'
 
-export const DARK_COLORS = {
-  primary: '#90CAF9',
-  secondary: '#80CBC4',
-  accent: '#FFD54F',
-}
-
 export function applyThemeColors(customization) {
-  if (Dark.isActive) {
-    setCssVar('primary', DARK_COLORS.primary)
-    setCssVar('secondary', DARK_COLORS.secondary)
-    setCssVar('accent', DARK_COLORS.accent)
-    return
-  }
-
   if (!customization) return
   if (customization.primary_color) setCssVar('primary', customization.primary_color)
   if (customization.secondary_color) setCssVar('secondary', customization.secondary_color)

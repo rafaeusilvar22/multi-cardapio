@@ -80,6 +80,7 @@
           v-model:pagination="pagination"
           :loading="loading"
           :rows-per-page-options="[10, 20, 50]"
+          :grid="$q.screen.lt.md"
           @request="onTableRequest"
         >
           <template v-slot:body-cell-image="props">
@@ -163,6 +164,40 @@
                 <q-tooltip>Excluir</q-tooltip>
               </q-btn>
             </q-td>
+          </template>
+
+          <template v-slot:item="props">
+            <div class="q-pa-xs col-12 col-sm-6">
+              <q-card flat bordered>
+                <q-card-section class="q-py-sm q-px-md">
+                  <div class="row items-center no-wrap q-gutter-sm">
+                    <q-avatar size="52px" color="grey-2" style="border-radius: 10px; flex-shrink: 0">
+                      <img v-if="props.row.image" :src="props.row.image" :alt="props.row.name" style="object-fit:cover" />
+                      <q-icon v-else name="fastfood" size="24px" color="grey-5" />
+                    </q-avatar>
+                    <div class="col">
+                      <div class="row items-center justify-between no-wrap">
+                        <div class="text-weight-medium ellipsis" style="max-width: 160px">{{ props.row.name }}</div>
+                        <q-toggle
+                          :model-value="props.row.status"
+                          color="positive"
+                          dense
+                          @update:model-value="handleToggleStatus(props.row)"
+                        />
+                      </div>
+                      <q-chip dense outline size="sm" :color="getCategoryColor(props.row.category)" :label="props.row.category" style="border-radius:20px" />
+                      <div class="row items-center justify-between q-mt-xs">
+                        <span class="text-weight-bold text-positive">{{ formatCurrency(props.row.price) }}</span>
+                        <div class="row q-gutter-xs">
+                          <q-btn flat round dense color="primary" icon="edit" size="sm" @click="handleEditProduct(props.row)" />
+                          <q-btn flat round dense color="negative" icon="delete" size="sm" @click="handleDeleteProduct(props.row)" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
           </template>
         </q-table>
       </q-card-section>

@@ -58,4 +58,15 @@ export const ProductService = {
       throw errorsMiddleware(error);
     }
   },
+
+  async uploadImage(uuid, file) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const resp = await api.post(`${BASE}/${uuid}/upload/image`, formData);
+      return resp.data;
+    } catch (error) {
+      throw errorsMiddleware(error);
+    }
+  },
 };

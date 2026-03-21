@@ -34,7 +34,9 @@ export function errorsMiddleware(error) {  // ✅ Removido async
     return error.message || DEFAULT_ERROR_MESSAGE;
   };
 
-  const message = extractErrorMessage(error);
+  const rawMessage = extractErrorMessage(error);
+  // Translate if a key exists, otherwise use as-is
+  const message = i18n.global.te(rawMessage) ? t(rawMessage) : rawMessage;
 
   if (error.response?.status === 401) {
     showAlertInfo(t("Warning"), message).then(() => {

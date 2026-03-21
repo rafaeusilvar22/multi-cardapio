@@ -46,6 +46,7 @@
           :rows="filteredCategories"
           :columns="columns"
           :pagination="{ rowsPerPage: 10 }"
+          :grid="$q.screen.lt.md"
         >
           <template v-slot:body-cell-name="props">
             <q-td :props="props">
@@ -126,6 +127,37 @@
                 <q-tooltip>Excluir</q-tooltip>
               </q-btn>
             </q-td>
+          </template>
+
+          <template v-slot:item="props">
+            <div class="q-pa-xs col-12">
+              <q-card flat bordered>
+                <q-card-section class="q-py-sm q-px-md">
+                  <div class="row items-center no-wrap q-gutter-sm">
+                    <q-avatar size="40px" :color="getCategoryColor(props.row)" text-color="white" style="border-radius: 10px; flex-shrink: 0">
+                      <q-icon :name="getCategoryIcon(props.row)" size="18px" />
+                    </q-avatar>
+                    <div class="col">
+                      <div class="text-weight-medium">{{ props.row.name }}</div>
+                      <div v-if="props.row.description" class="text-caption text-grey-6">{{ getDescriptionText(props.row.description) }}</div>
+                    </div>
+                    <div class="column items-center q-gutter-xs">
+                      <q-btn flat round dense size="sm" icon="keyboard_arrow_up" color="primary"
+                        @click="handleMoveOrder(props.row, 'up')"
+                        :disable="props.rowIndex === 0" />
+                      <span class="text-caption text-weight-medium">{{ props.row.order }}</span>
+                      <q-btn flat round dense size="sm" icon="keyboard_arrow_down" color="primary"
+                        @click="handleMoveOrder(props.row, 'down')"
+                        :disable="props.rowIndex === filteredCategories.length - 1" />
+                    </div>
+                    <div class="column q-gutter-xs">
+                      <q-btn flat round dense color="primary" icon="edit" size="sm" @click="handleEditCategory(props.row)" />
+                      <q-btn flat round dense color="negative" icon="delete" size="sm" @click="handleDeleteCategory(props.row)" />
+                    </div>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
           </template>
         </q-table>
       </q-card-section>

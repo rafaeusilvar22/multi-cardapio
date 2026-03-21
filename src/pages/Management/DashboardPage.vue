@@ -179,6 +179,7 @@
               :pagination="{ rowsPerPage: 5 }"
               hide-pagination
               hide-bottom
+              :grid="$q.screen.lt.md"
             >
               <template v-slot:body-cell-id="props">
                 <q-td :props="props">
@@ -220,6 +221,30 @@
                 <q-td :props="props">
                   <span class="text-grey-7 text-caption">{{ props.value }}</span>
                 </q-td>
+              </template>
+
+              <template v-slot:item="props">
+                <div class="q-pa-xs col-12">
+                  <q-card flat bordered>
+                    <q-card-section class="q-py-sm q-px-md">
+                      <div class="row items-center justify-between no-wrap">
+                        <div class="row items-center q-gutter-sm">
+                          <q-avatar size="32px" color="primary" text-color="white" style="font-size: 13px">
+                            {{ (props.row.customer?.name?.charAt(0) || '?').toUpperCase() }}
+                          </q-avatar>
+                          <div>
+                            <div class="text-weight-medium">{{ props.row.customer?.name || '—' }}</div>
+                            <div class="text-caption text-grey-6">#{{ props.row.id }} · {{ props.row.time }}</div>
+                          </div>
+                        </div>
+                        <div class="text-right">
+                          <div class="text-weight-bold text-positive">{{ formatCurrency(props.row.total) }}</div>
+                          <q-badge :color="statusColor(props.row.status)" :label="statusLabel(props.row.status)" style="padding: 2px 6px; font-size:10px" />
+                        </div>
+                      </div>
+                    </q-card-section>
+                  </q-card>
+                </div>
               </template>
             </q-table>
           </q-card-section>

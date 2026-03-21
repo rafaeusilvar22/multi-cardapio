@@ -71,6 +71,7 @@
           v-model:pagination="pagination"
           :loading="loading"
           :rows-per-page-options="[10, 20, 50]"
+          :grid="$q.screen.lt.md"
           @request="onTableRequest"
         >
           <template v-slot:body-cell-id="props">
@@ -220,6 +221,82 @@
                 <q-tooltip>Chat com cliente</q-tooltip>
               </q-btn>
             </q-td>
+          </template>
+
+          <template v-slot:item="props">
+            <div class="q-pa-xs col-12">
+              <q-card flat bordered>
+                <q-card-section class="q-py-sm q-px-md">
+                  <div class="row items-center justify-between no-wrap q-mb-xs">
+                    <div class="row items-center q-gutter-xs">
+                      <span class="text-weight-bold">#{{ props.row.id }}</span>
+                      <span class="text-caption text-grey-6">· {{ props.row.time }}</span>
+                    </div>
+                    <div class="rs-status-chip" :class="`rs-status-chip--${props.row.status}`" style="font-size:11px">
+                      <q-icon :name="getStatusIcon(props.row.status)" size="12px" />
+                      {{ getStatusLabel(props.row.status) }}
+                      <q-menu>
+                        <q-list style="min-width: 180px" dense>
+                          <q-item-label header class="text-weight-medium">Alterar Status</q-item-label>
+                          <q-separator />
+                          <q-item
+                            v-for="status in availableStatuses"
+                            :key="status.value"
+                            clickable
+                            v-close-popup
+                            @click="handleChangeStatus(props.row, status.value)"
+                          >
+                            <q-item-section avatar>
+                              <q-icon :name="status.icon" :color="status.color" size="20px" />
+                            </q-item-section>
+                            <q-item-section>{{ status.label }}</q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </div>
+                  </div>
+
+                  <div class="row items-center justify-between">
+                    <div>
+                      <div v-if="props.row.customer" class="text-weight-medium">{{ props.row.customer.name }}</div>
+                      <div v-if="props.row.customer" class="text-caption text-grey-6">{{ props.row.customer.phone }}</div>
+                      <div v-else class="text-grey-5 text-caption">Sem cliente</div>
+                    </div>
+                    <div class="text-right">
+                      <div class="text-weight-bold text-positive">{{ formatCurrency(props.row.total) }}</div>
+                      <div class="text-caption text-grey-6">{{ props.row.items }} itens</div>
+                    </div>
+                  </div>
+
+                  <q-separator class="q-my-sm" />
+
+                  <div class="row items-center justify-between">
+                    <div class="rs-type-badge" :class="`rs-type-badge--${props.row.order_type?.type}`" style="font-size:11px">
+                      <q-icon
+                        :name="props.row.order_type?.type === 'table' ? 'table_restaurant' : props.row.order_type?.type === 'pickup' ? 'store' : 'delivery_dining'"
+                        size="12px"
+                      />
+                      {{
+                        props.row.order_type?.type === 'table'
+                          ? `Mesa ${props.row.order_type.table_number}`
+                          : props.row.order_type?.type === 'pickup'
+                            ? 'Retirada'
+                            : 'Delivery'
+                      }}
+                    </div>
+                    <div class="row q-gutter-xs">
+                      <q-btn flat round dense color="primary" icon="visibility" size="sm" @click="handleViewDetails(props.row)">
+                        <q-tooltip>Ver Detalhes</q-tooltip>
+                      </q-btn>
+                      <q-btn flat round dense color="teal" icon="chat" size="sm" @click="handleOpenChat(props.row)">
+                        <q-badge v-if="unreadMessageOrders.has(props.row.uuid)" color="negative" floating rounded />
+                        <q-tooltip>Chat</q-tooltip>
+                      </q-btn>
+                    </div>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
           </template>
         </q-table>
       </q-card-section>
