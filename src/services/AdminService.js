@@ -70,6 +70,15 @@ export const AdminService = {
     }
   },
 
+  async resetWorkspaceOwnerPassword(uuid) {
+    try {
+      const resp = await api.patch(`${BASE}/workspaces/${uuid}/reset-password`)
+      return resp.data
+    } catch (error) {
+      throw errorsMiddleware(error)
+    }
+  },
+
   // Users
   async listUsers(params) {
     try {

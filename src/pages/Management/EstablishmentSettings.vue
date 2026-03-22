@@ -829,9 +829,6 @@ const geocodeEstablishmentAddress = async () => {
 const paymentMethods = ref([
   { id: 'cash', name: 'Dinheiro', icon: 'money', color: 'green', enabled: false },
   { id: 'pix', name: 'PIX', icon: 'qr_code', color: 'teal', enabled: false },
-  { id: 'credit_card', name: 'Cartão de Crédito', icon: 'credit_card', color: 'blue', enabled: false },
-  { id: 'debit_card', name: 'Cartão de Débito', icon: 'credit_card', color: 'indigo', enabled: false },
-  { id: 'other', name: 'Outro', icon: 'payments', color: 'grey', enabled: false },
 ])
 
 const applyDeliveryForm = (workspace) => {

@@ -15,6 +15,16 @@
           :label="workspace?.wks_status"
           class="text-capitalize"
         />
+        <q-btn
+          unelevated
+          no-caps
+          color="warning"
+          text-color="dark"
+          icon="lock_reset"
+          label="Redefinir senha"
+          style="border-radius: 8px"
+          @click="showResetConfirm = true"
+        />
         <q-btn-dropdown unelevated no-caps color="grey-3" text-color="dark" label="Alterar status" style="border-radius: 8px">
           <q-list>
             <q-item
@@ -220,6 +230,73 @@
       </q-tab-panels>
     </template>
   </q-page>
+
+  <!-- Modal: confirmação de reset de senha -->
+  <q-dialog v-model="showResetConfirm" persistent>
+    <q-card style="min-width: 340px">
+      <q-card-section class="row items-center q-pb-none">
+        <q-icon name="lock_reset" color="warning" size="28px" class="q-mr-sm" />
+        <div class="text-h6">Redefinir senha do responsável?</div>
+      </q-card-section>
+
+      <q-card-section class="text-body2 text-grey-8">
+        Isso irá gerar uma nova senha temporária para o responsável do estabelecimento
+        <strong>{{ workspace?.wks_name }}</strong>. O acesso atual será invalidado e o usuário
+        precisará definir uma nova senha no próximo login.
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn flat no-caps label="Cancelar" v-close-popup />
+        <q-btn
+          unelevated
+          no-caps
+          color="warning"
+          text-color="dark"
+          label="Gerar nova senha"
+          :loading="resettingPassword"
+          style="border-radius: 8px"
+          @click="handleResetPassword"
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
+  <!-- Modal: exibição da senha temporária gerada -->
+  <q-dialog v-model="showTempPassword" persistent>
+    <q-card style="min-width: 340px">
+      <q-card-section class="row items-center q-pb-none">
+        <q-icon name="key" color="positive" size="28px" class="q-mr-sm" />
+        <div class="text-h6">Nova senha gerada!</div>
+      </q-card-section>
+
+      <q-card-section>
+        <p class="text-body2 q-mb-md">
+          Passe a senha temporária abaixo para o responsável. Ela
+          <strong>só aparece uma vez</strong>.
+        </p>
+
+        <q-input
+          :model-value="generatedTempPassword"
+          outlined
+          dense
+          readonly
+          label="Senha temporária"
+        >
+          <template #append>
+            <q-btn flat round dense icon="content_copy" @click="copyTempPassword" />
+          </template>
+        </q-input>
+
+        <q-banner class="bg-warning text-dark q-mt-md rounded-borders text-caption">
+          No próximo login, o responsável será solicitado a definir uma nova senha.
+        </q-banner>
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn unelevated no-caps color="primary" label="Entendi" v-close-popup style="border-radius: 8px" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup>
@@ -238,9 +315,14 @@ const loading = ref(false)
 const savingData = ref(false)
 const savingSettings = ref(false)
 const loadingUsers = ref(false)
+const resettingPassword = ref(false)
 const tab = ref('dados')
 const workspace = ref(null)
 const users = ref([])
+
+const showResetConfirm = ref(false)
+const showTempPassword = ref(false)
+const generatedTempPassword = ref('')
 
 const statusOptions = [
   { label: 'Ativar', value: 'active' },
@@ -250,8 +332,6 @@ const statusOptions = [
 
 const paymentMethodOptions = [
   { label: 'Dinheiro', value: 'cash' },
-  { label: 'Cartão de Crédito', value: 'credit_card' },
-  { label: 'Cartão de Débito', value: 'debit_card' },
   { label: 'PIX', value: 'pix' },
 ]
 
@@ -369,6 +449,26 @@ async function changeStatus(status) {
   } catch (err) {
     notifyError(err?.message || 'Erro ao alterar status')
   }
+}
+
+async function handleResetPassword() {
+  resettingPassword.value = true
+  try {
+    const resp = await AdminService.resetWorkspaceOwnerPassword(route.params.uuid)
+    generatedTempPassword.value = resp?.data?.temp_password ?? ''
+    showResetConfirm.value = false
+    showTempPassword.value = true
+  } catch (err) {
+    notifyError(err?.response?.data?.message || err?.message || 'Erro ao redefinir senha')
+  } finally {
+    resettingPassword.value = false
+  }
+}
+
+function copyTempPassword() {
+  navigator.clipboard.writeText(generatedTempPassword.value).then(() => {
+    $q.notify({ type: 'positive', message: 'Copiado!', timeout: 1500 })
+  })
 }
 
 watch(tab, (val) => {

@@ -24,7 +24,7 @@
             </div>
           </div>
 
-          <q-form class="rs-login-form" @submit="handleLogin">
+          <q-form ref="loginFormRef" class="rs-login-form" @submit="handleLogin">
             <q-input
               v-model="formData.email"
               borderless
@@ -91,6 +91,68 @@
       </div>
     </div>
   </q-page>
+
+  <!-- Modal: primeiro acesso — definir nova senha -->
+  <q-dialog v-model="showChangePassword" persistent>
+    <q-card style="min-width: 360px">
+      <q-card-section>
+        <div class="text-h6 q-mb-xs">Defina sua nova senha</div>
+        <div class="text-caption text-grey-7">
+          Este é seu primeiro acesso. Crie uma senha pessoal para continuar.
+        </div>
+      </q-card-section>
+
+      <q-card-section>
+        <q-form ref="changePasswordFormRef" @submit="handleChangePassword">
+          <q-input
+            v-model="newPassword"
+            outlined
+            dense
+            :type="showNewPassword ? 'text' : 'password'"
+            label="Nova senha *"
+            class="q-mb-sm"
+            :rules="[(v) => (v && v.length >= 6) || 'Mínimo 6 caracteres']"
+          >
+            <template #append>
+              <q-icon
+                :name="showNewPassword ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="showNewPassword = !showNewPassword"
+              />
+            </template>
+          </q-input>
+
+          <q-input
+            v-model="confirmPassword"
+            outlined
+            dense
+            :type="showConfirmPassword ? 'text' : 'password'"
+            label="Confirmar senha *"
+            :rules="[(v) => v === newPassword || 'As senhas não coincidem']"
+          >
+            <template #append>
+              <q-icon
+                :name="showConfirmPassword ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="showConfirmPassword = !showConfirmPassword"
+              />
+            </template>
+          </q-input>
+
+          <q-btn
+            unelevated
+            no-caps
+            color="primary"
+            label="Salvar senha"
+            type="submit"
+            class="full-width q-mt-md"
+            :loading="changingPassword"
+            style="border-radius: 8px"
+          />
+        </q-form>
+      </q-card-section>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup>
@@ -98,6 +160,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from 'src/stores/auth'
+import { AuthService } from 'src/services/AuthService'
 import useNotify from 'src/composables/showNotify'
 
 defineOptions({
@@ -116,13 +179,47 @@ const formData = ref({
   password: '',
 })
 
+// Primeiro acesso
+const showChangePassword = ref(false)
+const changingPassword = ref(false)
+const newPassword = ref('')
+const confirmPassword = ref('')
+const showNewPassword = ref(false)
+const showConfirmPassword = ref(false)
+const changePasswordFormRef = ref(null)
+
 const handleLogin = async () => {
+  loading.value = true
   try {
     const response = await authStore.login(formData.value)
-    notifySuccess(t(response.message), 'bottom-right')
-    router.push({ name: 'dashboard' })
+    if (authStore.user?.status === 'first-access') {
+      showChangePassword.value = true
+    } else {
+      notifySuccess(t(response.message), 'bottom-right')
+      router.push({ name: 'dashboard' })
+    }
   } catch (error) {
     notifyError(t(error.message), 'bottom-right')
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleChangePassword = async () => {
+  changingPassword.value = true
+  try {
+    await AuthService.changePassword({
+      new_password: newPassword.value,
+      confirm_password: confirmPassword.value,
+    })
+    authStore.authUser = { ...authStore.authUser, status: 'active' }
+    showChangePassword.value = false
+    notifySuccess('Senha definida com sucesso!', 'bottom-right')
+    router.push({ name: 'dashboard' })
+  } catch (error) {
+    notifyError(error?.response?.data?.message || error?.message || 'Erro ao salvar senha', 'bottom-right')
+  } finally {
+    changingPassword.value = false
   }
 }
 </script>

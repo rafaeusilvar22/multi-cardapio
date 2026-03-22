@@ -63,4 +63,13 @@ export const AuthService = {
       throw errorsMiddleware(error);
     }
   },
+
+  async changePassword(payload) {
+    try {
+      const resp = await api.patch(`${USER}/me/change-password`, payload);
+      return resp.data;
+    } catch (error) {
+      throw errorsMiddleware(error);
+    }
+  },
 };
