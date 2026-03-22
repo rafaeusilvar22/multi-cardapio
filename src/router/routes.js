@@ -13,6 +13,7 @@ const routes = [
       { path: 'categorias/nova', name: 'nova-categoria', component: () => import('src/pages/Management/NewCategoryPage.vue') },
       { path: 'categorias/:uuid', name: 'editar-categoria', component: () => import('src/pages/Management/NewCategoryPage.vue') },
       { path: 'configuracoes-estabelecimento', name: 'configuracoes-estabelecimento', component: () => import('src/pages/Management/EstablishmentSettings.vue') },
+      { path: 'cupons', name: 'cupons', component: () => import('src/pages/Management/CouponsPage.vue') },
 
       // Super-admin routes
       { path: 'admin/estabelecimentos', name: 'admin-workspaces', component: () => import('src/pages/Admin/WorkspacesPage.vue'), meta: { requiresSuperAdmin: true } },

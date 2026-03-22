@@ -271,21 +271,35 @@
 
       <q-card-section>
         <p class="text-body2 q-mb-md">
-          Passe a senha temporária abaixo para o responsável. Ela
+          Passe as credenciais abaixo para o responsável. A senha
           <strong>só aparece uma vez</strong>.
         </p>
 
-        <q-input
-          :model-value="generatedTempPassword"
-          outlined
-          dense
-          readonly
-          label="Senha temporária"
-        >
-          <template #append>
-            <q-btn flat round dense icon="content_copy" @click="copyTempPassword" />
-          </template>
-        </q-input>
+        <div class="q-gutter-sm">
+          <q-input
+            :model-value="generatedTempEmail"
+            outlined
+            dense
+            readonly
+            label="E-mail de acesso"
+          >
+            <template #append>
+              <q-btn flat round dense icon="content_copy" @click="() => navigator.clipboard.writeText(generatedTempEmail)" />
+            </template>
+          </q-input>
+
+          <q-input
+            :model-value="generatedTempPassword"
+            outlined
+            dense
+            readonly
+            label="Senha temporária"
+          >
+            <template #append>
+              <q-btn flat round dense icon="content_copy" @click="copyTempPassword" />
+            </template>
+          </q-input>
+        </div>
 
         <q-banner class="bg-warning text-dark q-mt-md rounded-borders text-caption">
           No próximo login, o responsável será solicitado a definir uma nova senha.
@@ -323,6 +337,7 @@ const users = ref([])
 const showResetConfirm = ref(false)
 const showTempPassword = ref(false)
 const generatedTempPassword = ref('')
+const generatedTempEmail = ref('')
 
 const statusOptions = [
   { label: 'Ativar', value: 'active' },
@@ -456,6 +471,7 @@ async function handleResetPassword() {
   try {
     const resp = await AdminService.resetWorkspaceOwnerPassword(route.params.uuid)
     generatedTempPassword.value = resp?.data?.temp_password ?? ''
+    generatedTempEmail.value = resp?.data?.email ?? ''
     showResetConfirm.value = false
     showTempPassword.value = true
   } catch (err) {

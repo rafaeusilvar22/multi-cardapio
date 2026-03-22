@@ -116,4 +116,40 @@ export const EstablishmentService = {
       throw errorsMiddleware(error)
     }
   },
+
+  async getCoupons(groupUuid) {
+    try {
+      const resp = await api.get(`${BASE}/${groupUuid}/coupons`)
+      return resp.data
+    } catch (error) {
+      throw errorsMiddleware(error)
+    }
+  },
+
+  async createCoupon(groupUuid, data) {
+    try {
+      const resp = await api.post(`${BASE}/${groupUuid}/coupons`, data)
+      return resp.data
+    } catch (error) {
+      throw errorsMiddleware(error)
+    }
+  },
+
+  async updateCoupon(groupUuid, couponUuid, data) {
+    try {
+      const resp = await api.patch(`${BASE}/${groupUuid}/coupons/${couponUuid}`, data)
+      return resp.data
+    } catch (error) {
+      throw errorsMiddleware(error)
+    }
+  },
+
+  async deleteCoupon(groupUuid, couponUuid) {
+    try {
+      const resp = await api.delete(`${BASE}/${groupUuid}/coupons/${couponUuid}`)
+      return resp.data
+    } catch (error) {
+      throw errorsMiddleware(error)
+    }
+  },
 }

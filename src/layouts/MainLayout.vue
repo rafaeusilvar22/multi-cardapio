@@ -290,6 +290,7 @@ const ownerMenuList = [
   { label: 'Pedidos', icon: 'fa-solid fa-utensils', route: 'pedidos' },
   { label: 'Produtos', icon: 'fa-solid fa-burger', route: 'produtos' },
   { label: 'Categoria', icon: 'fa-solid fa-layer-group', route: 'categorias' },
+  { label: 'Cupons', icon: 'fa-solid fa-ticket', route: 'cupons' },
   { label: 'Ajustes', icon: 'fa-solid fa-gear', route: 'configuracoes-estabelecimento' },
 ]
 
