@@ -43,46 +43,15 @@
                 <div class="col-12 col-md-4">
                   <div class="text-subtitle2 text-weight-medium q-mb-md">Imagem do Produto</div>
 
-                  <div class="image-upload-section">
-                    <div class="image-preview-wrapper">
-                      <q-img v-if="form.image" :src="form.image" class="image-preview" fit="cover">
-                        <div class="absolute-bottom-right q-pa-sm">
-                          <q-btn
-                            round
-                            dense
-                            size="sm"
-                            color="negative"
-                            icon="close"
-                            @click="form.image = null"
-                          >
-                            <q-tooltip>Remover imagem</q-tooltip>
-                          </q-btn>
-                        </div>
-                      </q-img>
-                      <div v-else class="image-placeholder">
-                        <q-icon name="image" size="64px" color="grey-5" />
-                        <div class="text-caption text-grey-6 q-mt-sm">Nenhuma imagem</div>
-                      </div>
-                    </div>
-
-                    <q-file
-                      v-model="imageFile"
-                      outlined
-                      dense
-                      label="Escolher imagem"
-                      accept="image/*"
-                      @update:model-value="handleImageUpload"
-                      class="q-mt-md"
-                    >
-                      <template v-slot:prepend>
-                        <q-icon name="cloud_upload" />
-                      </template>
-                    </q-file>
-
-                    <div class="text-caption text-grey-6 q-mt-sm">
-                      Formatos aceitos: JPG, PNG, GIF (Max: 5MB)
-                    </div>
-                  </div>
+                  <ImageUploadZone
+                    :preview="form.image"
+                    label="Clique ou arraste a imagem"
+                    hint="Foto do produto"
+                    :aspect-ratio="1"
+                    @change="(file, url) => { imageFile = file; form.image = url }"
+                    @remove="() => { imageFile = null; form.image = null }"
+                    @error="notifyError"
+                  />
                 </div>
 
                 <!-- Coluna dos Dados -->
@@ -211,6 +180,24 @@
             />
           </q-card-actions>
         </q-card>
+
+        <!-- Grupos de Adicionais (somente no modo edição) -->
+        <AddonGroupsSection v-if="mode === 'edit' && productUuid" :product-uuid="productUuid" />
+
+        <!-- Produtos Recomendados (somente no modo edição) -->
+        <ProductRecommendationsSection
+          v-if="mode === 'edit' && productUuid && productId"
+          :product-uuid="productUuid"
+          :product-id="productId"
+        />
+
+        <!-- Aviso no modo criação -->
+        <q-banner v-if="mode === 'create'" class="q-mt-lg bg-blue-1 text-blue-9" rounded>
+          <template v-slot:avatar>
+            <q-icon name="info" color="blue-7" />
+          </template>
+          Grupos de adicionais e recomendações estarão disponíveis após salvar o produto.
+        </q-banner>
       </div>
     </div>
   </q-page>
@@ -224,6 +211,9 @@ import useLoading from 'src/composables/showLoading'
 import useNotify from 'src/composables/showNotify'
 import { ProductService } from 'src/services/ProductService'
 import { CategoryService } from 'src/services/CategoryService'
+import AddonGroupsSection from 'src/components/AddonGroupsSection.vue'
+import ProductRecommendationsSection from 'src/components/ProductRecommendationsSection.vue'
+import ImageUploadZone from 'src/components/ImageUploadZone.vue'
 
 defineOptions({
   name: 'ProductFormPage',
@@ -239,6 +229,7 @@ const formRef = ref(null)
 const imageFile = ref(null)
 const mode = ref('create')
 const productUuid = ref(null)
+const productId = ref(null)
 
 const categoriesRaw = ref([])
 
@@ -280,6 +271,7 @@ const loadProduct = async (uuid) => {
   try {
     const resp = await ProductService.getOne(uuid)
     const prod = resp?.data?.product || resp?.data || resp
+    productId.value = prod.id
     form.value = {
       name: prod.name,
       description: prod.description,
@@ -293,26 +285,6 @@ const loadProduct = async (uuid) => {
   } finally {
     hideLoading()
   }
-}
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
-
-const handleImageUpload = (file) => {
-  if (!file) return
-
-  if (!file.type.startsWith('image/')) {
-    notifyError('Apenas imagens são permitidas.')
-    imageFile.value = null
-    return
-  }
-
-  if (file.size > MAX_FILE_SIZE) {
-    notifyError('A imagem deve ter no máximo 5MB.')
-    imageFile.value = null
-    return
-  }
-
-  form.value.image = URL.createObjectURL(file)
 }
 
 const handleSubmit = async () => {
@@ -374,46 +346,6 @@ const handleCancel = () => {
 </script>
 
 <style lang="scss" scoped>
-.image-upload-section {
-  position: sticky;
-  top: 20px;
-}
-
-.image-preview-wrapper {
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 300px;
-  margin: 0 auto;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 2px dashed #e0e0e0;
-
-  .body--dark & {
-    border-color: #444;
-  }
-}
-
-.image-preview {
-  width: 100%;
-  height: 100%;
-  border-radius: 10px;
-}
-
-.image-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #f5f5f5;
-  border-radius: 10px;
-
-  .body--dark & {
-    background: #2a2a2a;
-  }
-}
-
 .status-section {
   background: #f8f9fa;
   border-radius: 8px;

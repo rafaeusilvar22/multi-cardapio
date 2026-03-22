@@ -10,14 +10,14 @@
           </div>
         </div>
 
-        <q-card>
+        <q-card flat bordered class="settings-card">
           <q-tabs
             v-model="activeTab"
-            dense
             align="left"
             indicator-color="primary"
             active-color="primary"
-            class="text-grey-7"
+            class="settings-tabs text-grey-6"
+            no-caps
           >
             <q-tab name="info" icon="store" label="Informações" />
             <q-tab name="hours" icon="schedule" label="Horários" />
@@ -29,116 +29,54 @@
 
           <q-tab-panels v-model="activeTab" animated>
             <!-- ===== TAB 1 — INFORMAÇÕES ===== -->
-            <q-tab-panel name="info">
+            <q-tab-panel name="info" class="q-pa-lg">
               <q-form ref="infoFormRef" @submit="handleSaveInfo">
-                <div class="q-gutter-lg">
-                  <!-- Informações Básicas -->
-                  <div>
-                    <div class="text-h6 text-weight-bold q-mb-md">
-                      <q-icon name="store" class="q-mr-sm" />Informações Básicas
+
+                <!-- Imagens -->
+                <div class="section-block q-mb-xl">
+                  <div class="section-title q-mb-lg">
+                    <q-icon name="image" size="20px" class="q-mr-sm" />Imagens
+                  </div>
+
+                  <div class="row q-col-gutter-lg">
+                    <!-- Logo -->
+                    <div class="col-12 col-sm-4">
+                      <div class="upload-label q-mb-sm">Logo do Estabelecimento</div>
+                      <ImageUploadZone
+                        :preview="infoForm.logo"
+                        label="Clique ou arraste o logo"
+                        hint="400 × 400 px recomendado"
+                        :aspect-ratio="1"
+                        @change="(file, url) => { logoFile = file; infoForm.logo = url }"
+                        @remove="() => { logoFile = null; infoForm.logo = null }"
+                        @error="notifyError"
+                      />
                     </div>
 
-                    <div class="q-gutter-md">
-                      <!-- Logo -->
-                      <div>
-                        <div class="text-subtitle2 text-weight-medium q-mb-sm">
-                          Logo do Estabelecimento
-                        </div>
-                        <div class="text-center">
-                          <div class="logo-preview-wrapper">
-                            <q-img
-                              v-if="infoForm.logo"
-                              :src="infoForm.logo"
-                              class="logo-preview"
-                              fit="contain"
-                            >
-                              <div class="absolute-bottom-right q-pa-sm">
-                                <q-btn
-                                  round
-                                  dense
-                                  size="sm"
-                                  color="negative"
-                                  icon="close"
-                                  @click="infoForm.logo = null"
-                                >
-                                  <q-tooltip>Remover logo</q-tooltip>
-                                </q-btn>
-                              </div>
-                            </q-img>
-                            <div v-else class="logo-placeholder">
-                              <q-icon name="image" size="48px" color="grey-5" />
-                              <div class="text-caption text-grey-6 q-mt-sm">Nenhuma logo</div>
-                            </div>
-                          </div>
+                    <!-- Banner -->
+                    <div class="col-12 col-sm-8">
+                      <div class="upload-label q-mb-sm">Banner do Estabelecimento</div>
+                      <ImageUploadZone
+                        :preview="infoForm.banner"
+                        label="Clique ou arraste o banner"
+                        hint="1200 × 400 px recomendado"
+                        :aspect-ratio="3"
+                        @change="(file, url) => { bannerFile = file; infoForm.banner = url }"
+                        @remove="() => { bannerFile = null; infoForm.banner = null }"
+                        @error="notifyError"
+                      />
+                    </div>
+                  </div>
+                </div>
 
-                          <q-file
-                            v-model="logoFile"
-                            outlined
-                            dense
-                            label="Escolher logo"
-                            accept="image/*"
-                            @update:model-value="handleLogoUpload"
-                            class="q-mt-md"
-                          >
-                            <template v-slot:prepend>
-                              <q-icon name="cloud_upload" />
-                            </template>
-                          </q-file>
-                          <div class="text-caption text-grey-6 q-mt-xs">
-                            Formatos: PNG, JPG (Recomendado: 400x400px)
-                          </div>
-                        </div>
-                      </div>
+                <!-- Informações Básicas -->
+                <div class="section-block q-mb-xl">
+                  <div class="section-title q-mb-lg">
+                    <q-icon name="store" size="20px" class="q-mr-sm" />Informações Básicas
+                  </div>
 
-                      <!-- Banner -->
-                      <div>
-                        <div class="text-subtitle2 text-weight-medium q-mb-sm">
-                          Banner do Estabelecimento
-                        </div>
-                        <div class="banner-preview-wrapper">
-                          <q-img
-                            v-if="infoForm.banner"
-                            :src="infoForm.banner"
-                            class="banner-preview"
-                            fit="cover"
-                          >
-                            <div class="absolute-bottom-right q-pa-sm">
-                              <q-btn
-                                round
-                                dense
-                                size="sm"
-                                color="negative"
-                                icon="close"
-                                @click="infoForm.banner = null; bannerFile = null"
-                              >
-                                <q-tooltip>Remover banner</q-tooltip>
-                              </q-btn>
-                            </div>
-                          </q-img>
-                          <div v-else class="banner-placeholder">
-                            <q-icon name="panorama" size="48px" color="grey-5" />
-                            <div class="text-caption text-grey-6 q-mt-sm">Nenhum banner</div>
-                          </div>
-                        </div>
-
-                        <q-file
-                          v-model="bannerFile"
-                          outlined
-                          dense
-                          label="Escolher banner"
-                          accept="image/*"
-                          @update:model-value="handleBannerUpload"
-                          class="q-mt-md"
-                        >
-                          <template v-slot:prepend>
-                            <q-icon name="cloud_upload" />
-                          </template>
-                        </q-file>
-                        <div class="text-caption text-grey-6 q-mt-xs">
-                          Formatos: PNG, JPG (Recomendado: 1200x400px)
-                        </div>
-                      </div>
-
+                  <div class="row q-col-gutter-md">
+                    <div class="col-12">
                       <q-input
                         v-model="infoForm.name"
                         outlined
@@ -148,7 +86,9 @@
                       >
                         <template v-slot:prepend><q-icon name="business" /></template>
                       </q-input>
+                    </div>
 
+                    <div class="col-12 col-sm-6">
                       <q-input
                         v-model="infoForm.phone"
                         outlined
@@ -159,7 +99,9 @@
                       >
                         <template v-slot:prepend><q-icon name="phone" /></template>
                       </q-input>
+                    </div>
 
+                    <div class="col-12 col-sm-6">
                       <q-input
                         v-model="infoForm.email"
                         outlined
@@ -169,7 +111,9 @@
                       >
                         <template v-slot:prepend><q-icon name="email" /></template>
                       </q-input>
+                    </div>
 
+                    <div class="col-12">
                       <q-input
                         v-model="infoForm.about"
                         outlined
@@ -182,29 +126,29 @@
                       </q-input>
                     </div>
                   </div>
+                </div>
 
-                  <!-- Endereço -->
-                  <div>
-                    <div class="text-h6 text-weight-bold q-mb-md">
-                      <q-icon name="place" class="q-mr-sm" />Endereço
+                <!-- Endereço -->
+                <div class="section-block q-mb-lg">
+                  <div class="section-title q-mb-lg">
+                    <q-icon name="place" size="20px" class="q-mr-sm" />Endereço
+                  </div>
+
+                  <div class="row q-col-gutter-md">
+                    <div class="col-12 col-sm-4">
+                      <q-input
+                        v-model="infoForm.address.cep"
+                        outlined
+                        label="CEP *"
+                        placeholder="00000-000"
+                        mask="#####-###"
+                        :rules="[(val) => !!val || 'CEP é obrigatório']"
+                      >
+                        <template v-slot:prepend><q-icon name="pin_drop" /></template>
+                      </q-input>
                     </div>
 
-                    <div class="q-gutter-md">
-                      <div class="row q-col-gutter-md">
-                        <div class="col-12 col-sm-6">
-                          <q-input
-                            v-model="infoForm.address.cep"
-                            outlined
-                            label="CEP *"
-                            placeholder="00000-000"
-                            mask="#####-###"
-                            :rules="[(val) => !!val || 'CEP é obrigatório']"
-                          >
-                            <template v-slot:prepend><q-icon name="pin_drop" /></template>
-                          </q-input>
-                        </div>
-                      </div>
-
+                    <div class="col-12 col-sm-8">
                       <q-input
                         v-model="infoForm.address.street"
                         outlined
@@ -214,65 +158,63 @@
                       >
                         <template v-slot:prepend><q-icon name="location_on" /></template>
                       </q-input>
+                    </div>
 
-                      <div class="row q-col-gutter-md">
-                        <div class="col-12 col-sm-4">
-                          <q-input
-                            v-model="infoForm.address.number"
-                            outlined
-                            label="Número *"
-                            placeholder="123"
-                            :rules="[(val) => !!val || 'Número é obrigatório']"
-                          />
-                        </div>
-                        <div class="col-12 col-sm-8">
-                          <q-input
-                            v-model="infoForm.address.complement"
-                            outlined
-                            label="Complemento"
-                            placeholder="Sala 10"
-                          />
-                        </div>
-                      </div>
+                    <div class="col-12 col-sm-3">
+                      <q-input
+                        v-model="infoForm.address.number"
+                        outlined
+                        label="Número *"
+                        placeholder="123"
+                        :rules="[(val) => !!val || 'Número é obrigatório']"
+                      />
+                    </div>
 
+                    <div class="col-12 col-sm-5">
+                      <q-input
+                        v-model="infoForm.address.complement"
+                        outlined
+                        label="Complemento"
+                        placeholder="Sala 10"
+                      />
+                    </div>
+
+                    <div class="col-12 col-sm-4">
                       <q-input
                         v-model="infoForm.address.neighborhood"
                         outlined
                         label="Bairro *"
                         placeholder="Centro"
                         :rules="[(val) => !!val || 'Bairro é obrigatório']"
-                      >
-                        <template v-slot:prepend><q-icon name="domain" /></template>
-                      </q-input>
+                      />
+                    </div>
 
-                      <div class="row q-col-gutter-md">
-                        <div class="col-12 col-sm-8">
-                          <q-input
-                            v-model="infoForm.address.city"
-                            outlined
-                            label="Cidade *"
-                            placeholder="Indaial"
-                            :rules="[(val) => !!val || 'Cidade é obrigatória']"
-                          >
-                            <template v-slot:prepend><q-icon name="location_city" /></template>
-                          </q-input>
-                        </div>
-                        <div class="col-12 col-sm-4">
-                          <q-input
-                            v-model="infoForm.address.state"
-                            outlined
-                            label="Estado *"
-                            placeholder="SC"
-                            maxlength="2"
-                            :rules="[(val) => !!val || 'Estado é obrigatório']"
-                          />
-                        </div>
-                      </div>
+                    <div class="col-12 col-sm-8">
+                      <q-input
+                        v-model="infoForm.address.city"
+                        outlined
+                        label="Cidade *"
+                        placeholder="Indaial"
+                        :rules="[(val) => !!val || 'Cidade é obrigatória']"
+                      >
+                        <template v-slot:prepend><q-icon name="location_city" /></template>
+                      </q-input>
+                    </div>
+
+                    <div class="col-12 col-sm-4">
+                      <q-input
+                        v-model="infoForm.address.state"
+                        outlined
+                        label="Estado *"
+                        placeholder="SC"
+                        maxlength="2"
+                        :rules="[(val) => !!val || 'Estado é obrigatório']"
+                      />
                     </div>
                   </div>
                 </div>
 
-                <div class="row justify-end q-mt-lg">
+                <div class="row justify-end">
                   <q-btn
                     unelevated
                     label="Salvar Informações"
@@ -286,15 +228,20 @@
             </q-tab-panel>
 
             <!-- ===== TAB 2 — HORÁRIOS ===== -->
-            <q-tab-panel name="hours">
-              <div class="text-h6 text-weight-bold q-mb-md">
-                <q-icon name="schedule" class="q-mr-sm" />Horário de Funcionamento
+            <q-tab-panel name="hours" class="q-pa-lg">
+              <div class="section-title q-mb-lg">
+                <q-icon name="schedule" size="20px" class="q-mr-sm" />Horário de Funcionamento
               </div>
 
               <div class="q-gutter-sm">
-                <div v-for="day in workingHours" :key="day.day" class="working-hour-item" :class="{ 'working-hour-item--active': day.enabled, 'working-hour-item--dark': isDark }">
-                  <div class="row items-center q-gutter-md">
-                    <div class="col-auto">
+                <div
+                  v-for="day in workingHours"
+                  :key="day.day"
+                  class="working-hour-item"
+                  :class="{ 'working-hour-item--active': day.enabled, 'working-hour-item--dark': isDark }"
+                >
+                  <div class="row items-center no-wrap">
+                    <div class="day-checkbox-col">
                       <q-checkbox
                         v-model="day.enabled"
                         :label="day.day"
@@ -302,7 +249,7 @@
                       />
                     </div>
                     <div class="col">
-                      <div class="row q-col-gutter-sm">
+                      <div class="row q-col-gutter-sm items-center">
                         <div class="col">
                           <q-input
                             v-model="day.open"
@@ -313,12 +260,12 @@
                             :disable="!day.enabled"
                           >
                             <template v-slot:prepend>
-                              <q-icon name="access_time" size="18px" />
+                              <q-icon name="wb_sunny" size="16px" />
                             </template>
                           </q-input>
                         </div>
-                        <div class="col-auto self-center">
-                          <span class="text-grey-7">até</span>
+                        <div class="col-auto">
+                          <span class="text-grey-5 text-caption">—</span>
                         </div>
                         <div class="col">
                           <q-input
@@ -330,7 +277,7 @@
                             :disable="!day.enabled"
                           >
                             <template v-slot:prepend>
-                              <q-icon name="access_time" size="18px" />
+                              <q-icon name="nights_stay" size="16px" />
                             </template>
                           </q-input>
                         </div>
@@ -353,66 +300,39 @@
             </q-tab-panel>
 
             <!-- ===== TAB 3 — APARÊNCIA ===== -->
-            <q-tab-panel name="colors">
-              <div class="text-h6 text-weight-bold q-mb-md">
-                <q-icon name="palette" class="q-mr-sm" />Aparência
+            <q-tab-panel name="colors" class="q-pa-lg">
+              <div class="section-title q-mb-lg">
+                <q-icon name="palette" size="20px" class="q-mr-sm" />Aparência
               </div>
 
-              <div class="row q-col-gutter-lg">
+              <div class="row q-col-gutter-xl">
                 <!-- Formulário de cores -->
                 <div class="col-12 col-md-6">
                   <div class="q-gutter-md">
-                    <!-- Cor Primária -->
-                    <div>
-                      <div class="text-subtitle2 q-mb-xs">Cor Primária *</div>
-                      <div class="row items-center q-gutter-sm">
-                        <input type="color" v-model="colorForm.primaryColor" class="color-picker" />
-                        <q-input
-                          v-model="colorForm.primaryColor"
-                          outlined
-                          dense
-                          label="Hex"
-                          class="col"
-                          placeholder="#000000"
-                        />
-                      </div>
-                    </div>
-
-                    <!-- Cor Secundária -->
-                    <div>
-                      <div class="text-subtitle2 q-mb-xs">Cor Secundária</div>
-                      <div class="row items-center q-gutter-sm">
+                    <div
+                      v-for="color in [
+                        { key: 'primaryColor', label: 'Cor Primária', required: true },
+                        { key: 'secondaryColor', label: 'Cor Secundária', required: false },
+                        { key: 'emphasisColor', label: 'Cor de Destaque', required: false },
+                      ]"
+                      :key="color.key"
+                      class="color-row"
+                      :class="{ 'color-row--dark': isDark }"
+                    >
+                      <div class="color-swatch-wrapper">
                         <input
                           type="color"
-                          v-model="colorForm.secondaryColor"
-                          class="color-picker"
-                        />
-                        <q-input
-                          v-model="colorForm.secondaryColor"
-                          outlined
-                          dense
-                          label="Hex"
-                          class="col"
-                          placeholder="#000000"
+                          v-model="colorForm[color.key]"
+                          class="color-swatch"
+                          :title="color.label"
                         />
                       </div>
-                    </div>
-
-                    <!-- Cor de Destaque -->
-                    <div>
-                      <div class="text-subtitle2 q-mb-xs">Cor de Destaque</div>
-                      <div class="row items-center q-gutter-sm">
-                        <input
-                          type="color"
-                          v-model="colorForm.emphasisColor"
-                          class="color-picker"
-                        />
+                      <div class="col">
                         <q-input
-                          v-model="colorForm.emphasisColor"
+                          v-model="colorForm[color.key]"
                           outlined
                           dense
-                          label="Hex"
-                          class="col"
+                          :label="color.label + (color.required ? ' *' : '')"
                           placeholder="#000000"
                         />
                       </div>
@@ -422,15 +342,16 @@
 
                 <!-- Preview ao vivo -->
                 <div class="col-12 col-md-6">
-                  <div class="text-subtitle2 q-mb-sm">Preview</div>
+                  <div class="upload-label q-mb-sm">Preview</div>
                   <div class="color-preview-card">
                     <div
                       class="color-preview-header"
                       :style="{ background: colorForm.primaryColor || '#1976d2' }"
                     >
+                      <q-icon name="restaurant_menu" color="white" size="20px" class="q-mr-sm" />
                       <span class="text-white text-weight-bold">Meu Estabelecimento</span>
                     </div>
-                    <div class="color-preview-body q-pa-md">
+                    <div class="color-preview-body q-pa-lg">
                       <q-btn
                         unelevated
                         label="Ver Cardápio"
@@ -438,12 +359,14 @@
                           background: colorForm.secondaryColor || '#26a69a',
                           color: '#fff',
                         }"
-                        class="q-mb-sm"
+                        class="q-mb-md"
+                        rounded
                       />
                       <br />
                       <q-chip
                         :style="{ background: colorForm.emphasisColor || '#ff9800', color: '#fff' }"
                         label="Promoção"
+                        icon="local_offer"
                       />
                     </div>
                   </div>
@@ -463,18 +386,18 @@
             </q-tab-panel>
 
             <!-- ===== TAB 4 — ENTREGA & PAGAMENTO ===== -->
-            <q-tab-panel name="delivery">
-              <div class="text-h6 text-weight-bold q-mb-md">
-                <q-icon name="delivery_dining" class="q-mr-sm" />Entrega & Pagamento
+            <q-tab-panel name="delivery" class="q-pa-lg">
+              <div class="section-title q-mb-lg">
+                <q-icon name="delivery_dining" size="20px" class="q-mr-sm" />Entrega & Pagamento
               </div>
 
               <div class="q-gutter-md">
                 <!-- Habilitar delivery -->
-                <div class="working-hour-item" :class="{ 'working-hour-item--dark': isDark }">
-                  <div class="row items-center justify-between">
+                <div class="toggle-row" :class="{ 'toggle-row--dark': isDark }">
+                  <div class="row items-center justify-between no-wrap">
                     <div>
                       <div class="text-subtitle2 text-weight-medium">Habilitar Delivery</div>
-                      <div class="text-caption text-grey-7">
+                      <div class="text-caption text-grey-6 q-mt-xs">
                         Permite que clientes solicitem entregas pelo cardápio
                       </div>
                     </div>
@@ -487,65 +410,149 @@
                   </div>
                 </div>
 
-                <q-input
-                  v-model.number="deliveryForm.delivery_fee"
-                  outlined
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  label="Taxa de Entrega (R$)"
-                  placeholder="5.00"
-                  :disable="!deliveryForm.delivery_enabled"
-                  :rules="[(val) => val === null || val >= 0 || 'Taxa não pode ser negativa']"
-                >
-                  <template v-slot:prepend><q-icon name="attach_money" /></template>
-                  <template v-slot:hint>Digite 0 para entrega gratuita</template>
-                </q-input>
+                <!-- Campos numéricos em grid -->
+                <div class="row q-col-gutter-md">
+                  <div class="col-12 col-sm-6">
+                    <q-input
+                      v-model.number="deliveryForm.delivery_fee"
+                      outlined
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      label="Taxa de Entrega (R$)"
+                      placeholder="5.00"
+                      :disable="!deliveryForm.delivery_enabled"
+                      :rules="[(val) => val === null || val >= 0 || 'Taxa não pode ser negativa']"
+                      hint="Digite 0 para entrega gratuita"
+                    >
+                      <template v-slot:prepend><q-icon name="attach_money" /></template>
+                    </q-input>
+                  </div>
 
-                <q-input
-                  v-model.number="deliveryForm.avg_preparation_time"
-                  outlined
-                  type="number"
-                  min="1"
-                  label="Tempo Médio de Preparo (minutos)"
-                  placeholder="30"
-                  :rules="[(val) => val === null || val >= 1 || 'Mínimo de 1 minuto']"
-                >
-                  <template v-slot:prepend><q-icon name="timer" /></template>
-                </q-input>
+                  <div class="col-12 col-sm-6">
+                    <q-input
+                      v-model.number="deliveryForm.avg_preparation_time"
+                      outlined
+                      type="number"
+                      min="1"
+                      label="Tempo Médio de Preparo (min)"
+                      placeholder="30"
+                      :rules="[(val) => val === null || val >= 1 || 'Mínimo de 1 minuto']"
+                    >
+                      <template v-slot:prepend><q-icon name="timer" /></template>
+                    </q-input>
+                  </div>
 
-                <q-input
-                  v-model.number="deliveryForm.min_order_amount"
-                  outlined
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  label="Pedido Mínimo (R$)"
-                  placeholder="20.00"
-                  :rules="[(val) => val === null || val >= 0 || 'Valor não pode ser negativo']"
-                >
-                  <template v-slot:prepend><q-icon name="shopping_cart" /></template>
-                  <template v-slot:hint>Deixe em branco para sem valor mínimo</template>
-                </q-input>
+                  <div class="col-12 col-sm-6">
+                    <q-input
+                      v-model.number="deliveryForm.min_order_amount"
+                      outlined
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      label="Pedido Mínimo (R$)"
+                      placeholder="20.00"
+                      :rules="[(val) => val === null || val >= 0 || 'Valor não pode ser negativo']"
+                      hint="Deixe em branco para sem valor mínimo"
+                    >
+                      <template v-slot:prepend><q-icon name="shopping_cart" /></template>
+                    </q-input>
+                  </div>
+
+                  <div class="col-12 col-sm-6">
+                    <q-input
+                      v-model.number="deliveryForm.delivery_radius_km"
+                      outlined
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      label="Raio de Entrega (km)"
+                      placeholder="5.0"
+                      :disable="!deliveryForm.delivery_enabled"
+                      :rules="[(val) => val === null || val >= 0 || 'Raio não pode ser negativo']"
+                      hint="Deixe em branco para sem limite de raio"
+                    >
+                      <template v-slot:prepend><q-icon name="radar" /></template>
+                    </q-input>
+                  </div>
+                </div>
+
+                <!-- Localização do estabelecimento -->
+                <div v-if="deliveryForm.delivery_enabled">
+                  <div class="upload-label q-mb-sm">Localização do estabelecimento</div>
+                  <div class="text-caption text-grey-6 q-mb-md">
+                    Usamos o endereço cadastrado em <strong>Informações</strong> para calcular o raio de entrega.
+                    Clique em "Buscar localização" para atualizar as coordenadas sempre que o endereço mudar.
+                  </div>
+
+                  <div class="row items-start q-col-gutter-md">
+                    <div class="col">
+                      <q-field
+                        outlined
+                        label="Endereço do estabelecimento"
+                        stack-label
+                        readonly
+                        bottom-slots
+                      >
+                        <template v-slot:control>
+                          <div class="self-center full-width q-py-xs text-body2" :class="establishmentAddressString ? '' : 'text-grey-5'">
+                            {{ establishmentAddressString || 'Nenhum endereço cadastrado em Informações' }}
+                          </div>
+                        </template>
+                        <template v-slot:prepend><q-icon name="place" /></template>
+                        <template v-slot:hint>
+                          <span v-if="geocodeStatus === 'success'" class="text-positive">
+                            Localização encontrada · {{ deliveryForm.latitude?.toFixed(6) }}, {{ deliveryForm.longitude?.toFixed(6) }}
+                          </span>
+                          <span v-else-if="geocodeStatus === 'error'" class="text-negative">
+                            Endereço não encontrado. Verifique o endereço na aba Informações.
+                          </span>
+                          <span v-else-if="deliveryForm.latitude && deliveryForm.longitude" class="text-grey-6">
+                            Localização salva · {{ deliveryForm.latitude?.toFixed(6) }}, {{ deliveryForm.longitude?.toFixed(6) }}
+                          </span>
+                          <span v-else class="text-grey-6">
+                            Clique em "Buscar localização" para geocodificar
+                          </span>
+                        </template>
+                      </q-field>
+                    </div>
+                    <div class="col-auto q-pt-sm">
+                      <q-btn
+                        outline
+                        color="primary"
+                        icon="my_location"
+                        label="Buscar localização"
+                        :loading="geocodeStatus === 'loading'"
+                        :disable="!establishmentAddressString"
+                        @click="geocodeEstablishmentAddress"
+                      />
+                    </div>
+                  </div>
+                </div>
 
                 <!-- Métodos de Pagamento -->
-                <div>
-                  <div class="text-subtitle2 text-weight-medium q-mb-md">
-                    Métodos de Pagamento aceitos:
-                  </div>
+                <div class="q-mt-sm">
+                  <div class="upload-label q-mb-md">Métodos de Pagamento aceitos</div>
                   <div class="payment-grid">
                     <div
                       v-for="method in paymentMethods"
                       :key="method.id"
                       class="payment-item"
-                      :class="{ 'payment-item--dark': isDark }"
+                      :class="{ 'payment-item--dark': isDark, 'payment-item--active': method.enabled }"
+                      @click="method.enabled = !method.enabled"
                     >
-                      <q-checkbox v-model="method.enabled" class="full-width">
-                        <div class="row items-center q-gutter-sm">
-                          <q-icon :name="method.icon" size="24px" :color="method.color" />
-                          <span class="text-weight-medium">{{ method.name }}</span>
-                        </div>
-                      </q-checkbox>
+                      <div class="row items-center q-gutter-sm no-wrap">
+                        <q-icon :name="method.icon" size="22px" :color="method.enabled ? method.color : 'grey-5'" />
+                        <span class="text-weight-medium" :class="method.enabled ? '' : 'text-grey-6'">
+                          {{ method.name }}
+                        </span>
+                        <q-space />
+                        <q-icon
+                          :name="method.enabled ? 'check_circle' : 'radio_button_unchecked'"
+                          :color="method.enabled ? 'positive' : 'grey-4'"
+                          size="18px"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -576,6 +583,7 @@ import { EstablishmentService } from 'src/services/EstablishmentService'
 import { useAuthStore } from 'src/stores/auth'
 import useLoading from 'src/composables/showLoading'
 import useNotify from 'src/composables/showNotify'
+import ImageUploadZone from 'src/components/ImageUploadZone.vue'
 
 const isDark = computed(() => Dark.isActive)
 
@@ -646,44 +654,6 @@ const applyGroupToForm = (group) => {
   infoForm.value.address.city = group.address_city || ''
   infoForm.value.address.state = group.address_state || ''
   infoForm.value.address.cep = group.address_zipcode || ''
-}
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
-
-const handleBannerUpload = (file) => {
-  if (!file) return
-
-  if (!file.type.startsWith('image/')) {
-    notifyError('Apenas imagens são permitidas.')
-    bannerFile.value = null
-    return
-  }
-
-  if (file.size > MAX_FILE_SIZE) {
-    notifyError('A imagem deve ter no máximo 5MB.')
-    bannerFile.value = null
-    return
-  }
-
-  infoForm.value.banner = URL.createObjectURL(file)
-}
-
-const handleLogoUpload = (file) => {
-  if (!file) return
-
-  if (!file.type.startsWith('image/')) {
-    notifyError('Apenas imagens são permitidas.')
-    logoFile.value = null
-    return
-  }
-
-  if (file.size > MAX_FILE_SIZE) {
-    notifyError('A imagem deve ter no máximo 5MB.')
-    logoFile.value = null
-    return
-  }
-
-  infoForm.value.logo = URL.createObjectURL(file)
 }
 
 const handleSaveInfo = async () => {
@@ -822,7 +792,39 @@ const deliveryForm = ref({
   delivery_fee: null,
   avg_preparation_time: null,
   min_order_amount: null,
+  latitude: null,
+  longitude: null,
+  delivery_radius_km: null,
 })
+
+const geocodeStatus = ref('idle') // 'idle' | 'loading' | 'success' | 'error'
+
+const establishmentAddressString = computed(() => {
+  const a = infoForm.value.address
+  return [a.street, a.number, a.neighborhood, a.city, a.state].filter(Boolean).join(', ')
+})
+
+const geocodeEstablishmentAddress = async () => {
+  const address = establishmentAddressString.value
+  if (!address) return
+  geocodeStatus.value = 'loading'
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1&countrycodes=br`,
+      { headers: { 'Accept-Language': 'pt-BR' } }
+    )
+    const data = await res.json()
+    if (!data || data.length === 0) {
+      geocodeStatus.value = 'error'
+      return
+    }
+    deliveryForm.value.latitude = parseFloat(data[0].lat)
+    deliveryForm.value.longitude = parseFloat(data[0].lon)
+    geocodeStatus.value = 'success'
+  } catch {
+    geocodeStatus.value = 'error'
+  }
+}
 
 const paymentMethods = ref([
   { id: 'cash', name: 'Dinheiro', icon: 'money', color: 'green', enabled: false },
@@ -838,6 +840,9 @@ const applyDeliveryForm = (workspace) => {
   deliveryForm.value.delivery_fee = workspace.delivery_fee ?? null
   deliveryForm.value.avg_preparation_time = workspace.avg_preparation_time ?? null
   deliveryForm.value.min_order_amount = workspace.min_order_amount ?? null
+  deliveryForm.value.latitude = workspace.latitude ?? null
+  deliveryForm.value.longitude = workspace.longitude ?? null
+  deliveryForm.value.delivery_radius_km = workspace.delivery_radius_km ?? null
   const methods = workspace.accepted_payment_methods || []
   paymentMethods.value.forEach((m) => { m.enabled = methods.includes(m.id) })
 }
@@ -860,6 +865,9 @@ const handleSaveDelivery = async () => {
         accepted_payment_methods: paymentMethods.value
           .filter((m) => m.enabled)
           .map((m) => m.id),
+        latitude: deliveryForm.value.latitude,
+        longitude: deliveryForm.value.longitude,
+        delivery_radius_km: deliveryForm.value.delivery_radius_km,
       },
     })
     await syncStore()
@@ -921,25 +929,74 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
+// ── Card geral ──────────────────────────────────────────────────────────────
+.settings-card {
+  border-radius: 12px;
+}
+
+.settings-tabs {
+  padding: 0 8px;
+
+  .q-tab {
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    min-height: 52px;
+  }
+}
+
+// ── Seções ──────────────────────────────────────────────────────────────────
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--q-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+  .body--dark & {
+    border-color: rgba(255, 255, 255, 0.08);
+    color: var(--q-primary);
+  }
+}
+
+.section-block {
+  position: relative;
+}
+
+.upload-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #90a4ae;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// ── Upload de imagens ────────────────────────────────────────────────────────
 .logo-preview-wrapper {
-  width: 200px;
-  height: 200px;
-  margin: 0 auto;
+  width: 160px;
+  height: 160px;
   border-radius: 12px;
   overflow: hidden;
   border: 2px dashed #e0e0e0;
-  background: white;
+  background: #fafafa;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: var(--q-primary);
+  }
 
   .body--dark & {
     background: #1e1e1e;
-    border-color: #444;
+    border-color: #3a3a3a;
   }
 }
 
 .logo-preview {
   width: 100%;
   height: 100%;
-  border-radius: 10px;
 }
 
 .logo-placeholder {
@@ -949,12 +1006,6 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
-  border-radius: 10px;
-
-  .body--dark & {
-    background: #2a2a2a;
-  }
 }
 
 .banner-preview-wrapper {
@@ -963,11 +1014,16 @@ onMounted(async () => {
   border-radius: 12px;
   overflow: hidden;
   border: 2px dashed #e0e0e0;
-  background: white;
+  background: #fafafa;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: var(--q-primary);
+  }
 
   .body--dark & {
     background: #1e1e1e;
-    border-color: #444;
+    border-color: #3a3a3a;
   }
 }
 
@@ -983,92 +1039,160 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
-  border-radius: 10px;
+}
 
-  .body--dark & {
-    background: #2a2a2a;
-  }
+// ── Horários ─────────────────────────────────────────────────────────────────
+.day-checkbox-col {
+  width: 148px;
+  flex-shrink: 0;
 }
 
 .working-hour-item {
   background: #f8f9fa;
-  border-radius: 8px;
-  padding: 12px;
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 1px solid transparent;
   border-left: 3px solid #e0e0e0;
-  transition: border-color 0.2s, background 0.2s;
+  transition: all 0.2s;
 
   &--active {
+    border-color: rgba(0, 0, 0, 0.06);
     border-left-color: var(--q-primary);
-    background: rgba(229, 57, 53, 0.04);
+    background: rgba(var(--q-primary-rgb, 25, 118, 210), 0.04);
   }
 
   &--dark {
-    background: #2a2a2a;
-    border-left-color: #444;
+    background: #242424;
+    border-color: transparent;
+    border-left-color: #3a3a3a;
 
     &.working-hour-item--active {
-      background: rgba(229, 57, 53, 0.1);
+      background: rgba(var(--q-primary-rgb, 25, 118, 210), 0.1);
       border-left-color: var(--q-primary);
     }
   }
 }
 
-.payment-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+// ── Cores ────────────────────────────────────────────────────────────────────
+.color-row {
+  display: flex;
+  align-items: center;
   gap: 12px;
-}
-
-.payment-item {
   background: #f8f9fa;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 12px;
-  border: 2px solid #e0e0e0;
-  transition: all 0.2s ease;
+  border: 1px solid #eeeeee;
+  transition: border-color 0.2s;
 
-  &:has(.q-checkbox--truthy) {
-    background: rgba(229, 57, 53, 0.06);
+  &:hover {
     border-color: var(--q-primary);
   }
 
   &--dark {
-    background: #2a2a2a;
-    border-color: #444;
-
-    &:has(.q-checkbox--truthy) {
-      background: rgba(229, 57, 53, 0.15);
-      border-color: var(--q-primary);
-    }
+    background: #242424;
+    border-color: #3a3a3a;
   }
 }
 
-.color-picker {
-  width: 48px;
-  height: 48px;
-  padding: 2px;
+.color-swatch-wrapper {
+  flex-shrink: 0;
+}
+
+.color-swatch {
+  width: 44px;
+  height: 44px;
+  padding: 3px;
   border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   background: none;
+  display: block;
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  &::-webkit-color-swatch {
+    border: none;
+    border-radius: 6px;
+  }
 }
 
 .color-preview-card {
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   overflow: hidden;
+
+  .body--dark & {
+    border-color: #3a3a3a;
+  }
 }
 
 .color-preview-header {
-  padding: 16px;
+  padding: 20px 16px;
+  display: flex;
+  align-items: center;
   transition: background 0.3s;
 }
 
 .color-preview-body {
-  background: #fff;
+  background: #fafafa;
+  min-height: 100px;
 
   .body--dark & {
     background: #1e1e1e;
+  }
+}
+
+// ── Entrega ──────────────────────────────────────────────────────────────────
+.toggle-row {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 14px 16px;
+  border: 1px solid #eeeeee;
+
+  &--dark {
+    background: #242424;
+    border-color: #3a3a3a;
+  }
+}
+
+.payment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.payment-item {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 12px 14px;
+  border: 1.5px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+
+  &:hover {
+    border-color: #bdbdbd;
+  }
+
+  &--active {
+    background: rgba(var(--q-positive-rgb, 33, 150, 83), 0.06);
+    border-color: var(--q-positive, #21a854);
+  }
+
+  &--dark {
+    background: #242424;
+    border-color: #3a3a3a;
+
+    &.payment-item--active {
+      background: rgba(var(--q-positive-rgb, 33, 150, 83), 0.14);
+      border-color: var(--q-positive, #21a854);
+    }
+
+    &:hover {
+      border-color: #555;
+    }
   }
 }
 </style>
