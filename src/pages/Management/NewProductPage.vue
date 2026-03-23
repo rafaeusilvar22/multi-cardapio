@@ -128,6 +128,35 @@
                       </div>
                     </div>
 
+                    <!-- Opções de Montagem -->
+                    <q-input
+                      v-model.number="form.max_flavors"
+                      outlined
+                      type="number"
+                      min="0"
+                      label="Máximo de opções de montagem"
+                      hint="0 = sem opções; 1 = escolha única; 2 = meio a meio (pizza, açaí); 3+ = múltiplos"
+                      :rules="[(val) => val >= 0 || 'Deve ser >= 0']"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="tune" />
+                      </template>
+                    </q-input>
+
+                    <!-- Comportamento das opções de montagem -->
+                    <div v-if="form.max_flavors > 0" class="q-gutter-sm">
+                      <q-toggle
+                        v-model="form.flavors_exact"
+                        color="primary"
+                        label="Exigir preenchimento de todos os slots"
+                      />
+                      <q-toggle
+                        v-model="form.allow_flavor_repeat"
+                        color="primary"
+                        label="Permitir repetição de opção"
+                      />
+                    </div>
+
                     <!-- Status -->
                     <div class="status-section">
                       <div class="text-subtitle2 text-weight-medium q-mb-sm">Disponibilidade</div>
@@ -184,6 +213,12 @@
         <!-- Grupos de Adicionais (somente no modo edição) -->
         <AddonGroupsSection v-if="mode === 'edit' && productUuid" :product-uuid="productUuid" />
 
+        <!-- Opções de Montagem (somente no modo edição e quando max_flavors > 0) -->
+        <FlavorSection
+          v-if="mode === 'edit' && productUuid && form.max_flavors > 0"
+          :product-uuid="productUuid"
+        />
+
         <!-- Produtos Recomendados (somente no modo edição) -->
         <ProductRecommendationsSection
           v-if="mode === 'edit' && productUuid && productId"
@@ -196,7 +231,7 @@
           <template v-slot:avatar>
             <q-icon name="info" color="blue-7" />
           </template>
-          Grupos de adicionais e recomendações estarão disponíveis após salvar o produto.
+          Grupos de adicionais, opções de montagem e recomendações estarão disponíveis após salvar o produto.
         </q-banner>
       </div>
     </div>
@@ -212,6 +247,7 @@ import useNotify from 'src/composables/showNotify'
 import { ProductService } from 'src/services/ProductService'
 import { CategoryService } from 'src/services/CategoryService'
 import AddonGroupsSection from 'src/components/AddonGroupsSection.vue'
+import FlavorSection from 'src/components/FlavorSection.vue'
 import ProductRecommendationsSection from 'src/components/ProductRecommendationsSection.vue'
 import ImageUploadZone from 'src/components/ImageUploadZone.vue'
 
@@ -244,6 +280,9 @@ const form = ref({
   category: null,
   image: null,
   status: true,
+  max_flavors: 0,
+  flavors_exact: false,
+  allow_flavor_repeat: true,
 })
 
 onMounted(async () => {
@@ -279,6 +318,9 @@ const loadProduct = async (uuid) => {
       category: prod.categories?.[0]?.id || null,
       image: prod.image_url,
       status: prod.is_available,
+      max_flavors: prod.max_flavors ?? 0,
+      flavors_exact: prod.flavors_exact ?? false,
+      allow_flavor_repeat: prod.allow_flavor_repeat ?? true,
     }
   } catch {
     notifyError('Erro ao carregar produto')
@@ -296,6 +338,9 @@ const handleSubmit = async () => {
     prod_description: form.value.description,
     prod_price: form.value.price,
     prod_is_available: form.value.status,
+    prod_max_flavors: form.value.max_flavors,
+    prod_flavors_exact: form.value.flavors_exact,
+    prod_allow_flavor_repeat: form.value.allow_flavor_repeat,
     category_ids: form.value.category ? [form.value.category] : [],
   }
 
@@ -305,17 +350,27 @@ const handleSubmit = async () => {
 
     if (mode.value === 'create') {
       const resp = await ProductService.create(apiData)
-      uuid = resp?.product?.uuid
+      uuid = resp?.data?.product?.uuid
+      const id = resp?.data?.product?.id
+
+      if (imageFile.value && uuid) {
+        await ProductService.uploadImage(uuid, imageFile.value)
+      }
+
+      productUuid.value = uuid
+      productId.value = id
+      mode.value = 'edit'
+      notifySuccess('Produto cadastrado! Agora configure os adicionais e opções de montagem.')
     } else {
       await ProductService.update(uuid, apiData)
-    }
 
-    if (imageFile.value && uuid) {
-      await ProductService.uploadImage(uuid, imageFile.value)
-    }
+      if (imageFile.value && uuid) {
+        await ProductService.uploadImage(uuid, imageFile.value)
+      }
 
-    notifySuccess(mode.value === 'create' ? 'Produto cadastrado com sucesso!' : 'Produto atualizado com sucesso!')
-    router.push('/produtos')
+      notifySuccess('Produto atualizado com sucesso!')
+      router.push('/produtos')
+    }
   } catch {
     notifyError(
       mode.value === 'create' ? 'Erro ao cadastrar produto' : 'Erro ao atualizar produto',
