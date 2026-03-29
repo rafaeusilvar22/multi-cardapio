@@ -166,7 +166,7 @@
               />
             </q-item-section>
             <q-item-section
-              class="rs-l-regular"
+              class="rs-s-regular"
               :class="
                 $route.name === menuItem.route
                   ? 'text-primary text-weight-medium'
@@ -180,6 +180,52 @@
           </q-item>
           <q-separator v-if="menuItem.separator" class="q-my-xs" />
         </template>
+
+        <!-- Configurações (expansion) — apenas para owner/manager -->
+        <q-expansion-item
+          v-if="!isSuperAdmin"
+          v-model="settingsExpanded"
+          icon="fa-solid fa-gear"
+          label="Configurações"
+          dense
+          class="rs-menu-item rs-settings-expansion"
+          :header-class="[
+            'rs-menu-item__header',
+            isSettingsRoute ? 'rs-menu-item__header--active' : '',
+          ]"
+          expand-icon-class="rs-settings-expand-icon"
+        >
+          <q-item
+            v-for="sub in settingsSubMenu"
+            :key="sub.route"
+            v-ripple
+            clickable
+            :active="$route.name === sub.route"
+            active-class="rs-menu-item--active"
+            class="rs-menu-item rs-menu-item--sub"
+            :to="{ name: sub.route }"
+          >
+            <q-item-section avatar>
+              <q-icon
+                :name="sub.icon"
+                :color="$route.name === sub.route ? 'primary' : 'grey-6'"
+                size="xs"
+              />
+            </q-item-section>
+            <q-item-section
+              class="rs-s-regular"
+              :class="
+                $route.name === sub.route
+                  ? 'text-primary text-weight-medium'
+                  : isDark
+                    ? 'text-grey-4'
+                    : 'text-grey-7'
+              "
+            >
+              {{ sub.label }}
+            </q-item-section>
+          </q-item>
+        </q-expansion-item>
       </q-list>
     </q-drawer>
 
@@ -191,7 +237,7 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted, watch, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { Dark } from 'quasar'
 import useStringHelpers from 'src/composables/useStringHelpers'
 import { useAuthStore } from 'src/stores/auth'
@@ -200,6 +246,7 @@ import { useOrderPolling } from 'src/composables/useOrderPolling'
 
 const { getInitials } = useStringHelpers()
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const { newOrdersCount, clearNewOrders, startPolling, stopPolling } = useOrderPolling()
@@ -291,8 +338,25 @@ const ownerMenuList = [
   { label: 'Produtos', icon: 'fa-solid fa-burger', route: 'produtos' },
   { label: 'Categoria', icon: 'fa-solid fa-layer-group', route: 'categorias' },
   { label: 'Cupons', icon: 'fa-solid fa-ticket', route: 'cupons' },
-  { label: 'Ajustes', icon: 'fa-solid fa-gear', route: 'configuracoes-estabelecimento' },
 ]
+
+const settingsSubMenu = [
+  { label: 'Informações', icon: 'fa-solid fa-store', route: 'configuracoes-informacoes' },
+  { label: 'Horários', icon: 'fa-solid fa-clock', route: 'configuracoes-horarios' },
+  { label: 'Aparência', icon: 'fa-solid fa-palette', route: 'configuracoes-aparencia' },
+  {
+    label: 'Entrega & Pagamento',
+    icon: 'fa-solid fa-truck',
+    route: 'configuracoes-entrega-pagamento',
+  },
+]
+
+const settingsRoutes = settingsSubMenu.map((s) => s.route)
+const isSettingsRoute = computed(() => settingsRoutes.includes(route.name))
+const settingsExpanded = ref(isSettingsRoute.value)
+watch(isSettingsRoute, (val) => {
+  if (val) settingsExpanded.value = true
+})
 
 const adminMenuList = [
   { label: 'Estabelecimentos', icon: 'fa-solid fa-store', route: 'admin-workspaces' },
@@ -443,5 +507,37 @@ function toggleLeftDrawer() {
 
 :global(.body--dark) .rs-user-dropdown:hover {
   background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Settings expansion item */
+.rs-settings-expansion {
+  border-radius: 8px;
+  margin-bottom: 2px;
+}
+
+:deep(.rs-menu-item__header) {
+  border-radius: 8px;
+  min-height: 44px;
+  padding: 0 16px 0 12px;
+  font-size: 14px;
+  color: #757575;
+
+  .body--dark & {
+    color: #bdbdbd;
+  }
+}
+
+:deep(.rs-menu-item__header--active) {
+  color: var(--q-primary) !important;
+  font-weight: 500;
+}
+
+:deep(.rs-settings-expand-icon) {
+  font-size: 16px;
+  color: #9e9e9e;
+}
+
+.rs-menu-item--sub {
+  padding-left: 16px;
 }
 </style>

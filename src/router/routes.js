@@ -12,7 +12,11 @@ const routes = [
       { path: 'categorias', name: 'categorias', component: () => import('src/pages/Management/CategoriesPage.vue') },
       { path: 'categorias/nova', name: 'nova-categoria', component: () => import('src/pages/Management/NewCategoryPage.vue') },
       { path: 'categorias/:uuid', name: 'editar-categoria', component: () => import('src/pages/Management/NewCategoryPage.vue') },
-      { path: 'configuracoes-estabelecimento', name: 'configuracoes-estabelecimento', component: () => import('src/pages/Management/EstablishmentSettings.vue') },
+      { path: 'configuracoes-estabelecimento', redirect: { name: 'configuracoes-informacoes' } },
+      { path: 'configuracoes/informacoes', name: 'configuracoes-informacoes', component: () => import('src/pages/Management/settings/SettingsInfoPage.vue') },
+      { path: 'configuracoes/horarios', name: 'configuracoes-horarios', component: () => import('src/pages/Management/settings/SettingsHoursPage.vue') },
+      { path: 'configuracoes/aparencia', name: 'configuracoes-aparencia', component: () => import('src/pages/Management/settings/SettingsAppearancePage.vue') },
+      { path: 'configuracoes/entrega-pagamento', name: 'configuracoes-entrega-pagamento', component: () => import('src/pages/Management/settings/SettingsDeliveryPage.vue') },
       { path: 'cupons', name: 'cupons', component: () => import('src/pages/Management/CouponsPage.vue') },
 
       // Super-admin routes
