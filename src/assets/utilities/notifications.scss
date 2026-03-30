@@ -1,27 +1,97 @@
-.bg-success-notify {
-  background-color: #4ade80;
-  border-radius: 8px;
+// ── Variáveis por tipo ────────────────────────────────────────────────────────
+$notify-success: #22c55e;
+$notify-error:   #ef4444;
+$notify-warning: #f59e0b;
+$notify-info:    #3b82f6;
+$notify-alert:   #a855f7;
+
+// ── Base ──────────────────────────────────────────────────────────────────────
+.rs-notify {
+  border-radius: 12px !important;
+  min-width: 300px !important;
+  max-width: 420px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.08),
+    0 10px 30px -5px rgba(0, 0, 0, 0.12) !important;
+
+  .q-notification__wrapper {
+    padding: 14px 16px 14px 18px !important;
+    align-items: center !important;
+  }
+
+  .q-notification__icon {
+    font-size: 22px !important;
+    margin-right: 12px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .q-notification__message {
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    line-height: 1.5 !important;
+    color: #111827 !important;
+  }
+
+  // Progress bar container
+  .q-notification__progress {
+    height: 3px !important;
+    opacity: 0.6;
+  }
 }
 
-.bg-success-notify .q-notification__message {
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 24px;
+// Dark mode base
+.body--dark .rs-notify {
+  background: #1e1e1e !important;
+  color: #f3f4f6 !important;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 10px 30px -5px rgba(0, 0, 0, 0.5) !important;
+
+  .q-notification__message {
+    color: #f3f4f6 !important;
+  }
 }
 
-.bg-error-notify {
-  background-color: #fff;
+// ── Success ───────────────────────────────────────────────────────────────────
+.rs-notify--success {
+  border-left: 4px solid $notify-success !important;
+
+  .q-notification__icon { color: $notify-success !important; }
+  .q-notification__progress { background: $notify-success !important; }
 }
 
-.body--dark .bg-error-notify {
-  background-color: #2a2a2a;
+// ── Error ─────────────────────────────────────────────────────────────────────
+.rs-notify--error {
+  border-left: 4px solid $notify-error !important;
+
+  .q-notification__icon { color: $notify-error !important; }
+  .q-notification__progress { background: $notify-error !important; }
 }
 
-.bg-error-notify .q-notification__message {
-  color: #ef4444;
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 24px;
+// ── Warning ───────────────────────────────────────────────────────────────────
+.rs-notify--warning {
+  border-left: 4px solid $notify-warning !important;
+
+  .q-notification__icon { color: $notify-warning !important; }
+  .q-notification__progress { background: $notify-warning !important; }
+}
+
+// ── Info ──────────────────────────────────────────────────────────────────────
+.rs-notify--info {
+  border-left: 4px solid $notify-info !important;
+
+  .q-notification__icon { color: $notify-info !important; }
+  .q-notification__progress { background: $notify-info !important; }
+}
+
+// ── Alert ─────────────────────────────────────────────────────────────────────
+.rs-notify--alert {
+  border-left: 4px solid $notify-alert !important;
+
+  .q-notification__icon { color: $notify-alert !important; }
+  .q-notification__progress { background: $notify-alert !important; }
 }
